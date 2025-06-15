@@ -1,61 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Conductor Sizing Calculator</title>
+  <meta charset="UTF-8" />
+  <title>Automatic Conductor Sizing Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f7f7f7;
+      background: #f0f4f8;
       padding: 20px;
     }
+
     h2, h3 {
       color: #003366;
     }
+
     table {
       border-collapse: collapse;
       width: 100%;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
+
     th, td {
-      border: 1px solid #999;
+      border: 1px solid #ccc;
       padding: 8px;
       text-align: center;
     }
+
     th {
-      background-color: #003366;
+      background-color: #002b45;
       color: white;
     }
+
     #electricalTable tbody tr {
-      background-color: #fff9db;
+      background-color: #fffbe6;
     }
+
     #auxiliaryTable tbody tr {
-      background-color: #e0f0ff;
+      background-color: #e6f2ff;
     }
+
     input[type="number"], select {
       width: 100%;
       padding: 4px;
     }
+
     button {
       padding: 6px 12px;
       margin: 5px 0;
-      background-color: #004d99;
+      background-color: #003366;
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
     }
+
     button:hover {
-      background-color: #0066cc;
+      background-color: #0059b3;
     }
+
     .hidden {
       display: none;
     }
+
     #result {
-      background: #e6f7ff;
-      border: 1px solid #0099cc;
-      padding: 10px;
-      margin-top: 20px;
+      background: #ffffff;
+      border: 1px solid #003366;
+      padding: 12px;
       font-size: 1rem;
     }
   </style>
@@ -71,7 +81,7 @@
   <option value="both">Both</option>
 </select>
 
-<!-- Electrical Table -->
+<!-- Electrical Section -->
 <div id="electricalSection">
   <h3>⚡ Electrical</h3>
   <table id="electricalTable">
@@ -89,7 +99,7 @@
   <button onclick="addElectricalRow()">Add Electrical Row</button>
 </div>
 
-<!-- Auxiliary Table -->
+<!-- Auxiliary Section -->
 <div id="auxiliarySection" class="hidden">
   <h3>🟦 Auxiliary</h3>
   <table id="auxiliaryTable">
@@ -111,29 +121,60 @@
 <h3>📦 Conduit Selection</h3>
 <label for="conduitType"><strong>Conduit Type:</strong></label>
 <select id="conduitType" onchange="updateTotals()">
+  <option value="EMT">EMT</option>
   <option value="ENT">ENT</option>
   <option value="FMC">FMC</option>
   <option value="IMC">IMC</option>
+  <option value="LFNC_A">LFNC_A</option>
+  <option value="LFNC_B">LFNC_B</option>
+  <option value="LFMC">LFMC</option>
+  <option value="RMC">RMC</option>
+  <option value="PVC40">PVC40</option>
+  <option value="PVC80">PVC80</option>
 </select>
 
-<!-- Results -->
+<!-- Result -->
 <div id="result"></div>
 
 <script>
   const wireSizes = {
-    "14 AWG(2.5 mm2)": { THW: 0.0139, THHN: 0.0097, RHW: 0.0293, XHHW: 0.0139 },
-    "12AWG(4 mm2)": { THW: 0.0181, THHN: 0.0133, RHW: 0.0353, XHHW: 0.0181 },
-    "10AWG(6 mm2)": { THW: 0.0243, THHN: 0.0211, RHW: 0.0437, XHHW: 0.0243 },
-    "8AWG(10 mm2)": { THW: 0.0437, THHN: 0.0366, RHW: 0.0835, XHHW: 0.0437 },
-    "6AWG(16 mm2)": { THW: 0.0726, THHN: 0.0507, RHW: 0.1041, XHHW: 0.059 },
-    "4AWG(25 mm2)": { THW: 0.0973, THHN: 0.0824, RHW: 0.1333, XHHW: 0.0814 },
-    "3AWG(35 mm2)": { THW: 0.1134, THHN: 0.0973, RHW: 0.1521, XHHW: 0.0962 }
-  };
+  "14 AWG(2.5 mm2)": { THW: 0.0139, THHN: 0.0097, RHW: 0.0293, XHHW: 0.0139 },
+  "12AWG(4 mm2)": { THW: 0.0181, THHN: 0.0133, RHW: 0.0353, XHHW: 0.0181 },
+  "10AWG(6 mm2)": { THW: 0.0243, THHN: 0.0211, RHW: 0.0437, XHHW: 0.0243 },
+  "8AWG(10 mm2)": { THW: 0.0437, THHN: 0.0366, RHW: 0.0835, XHHW: 0.0437 },
+  "6AWG(16 mm2)": { THW: 0.0726, THHN: 0.0507, RHW: 0.1041, XHHW: 0.059 },
+  "4AWG(25 mm2)": { THW: 0.0973, THHN: 0.0824, RHW: 0.1333, XHHW: 0.0814 },
+  "3AWG(35 mm2)": { THW: 0.1134, THHN: 0.0973, RHW: 0.1521, XHHW: 0.0962 },
+  "2AWG(35 mm2)": { THW: 0.1300, THHN: 0.1100, RHW: 0.1600, XHHW: 0.1000 },
+  "1AWG(50 mm2)": { THW: 0.1500, THHN: 0.1300, RHW: 0.1800, XHHW: 0.1200 },
+  "1/0AWG(55 mm2)": { THW: 0.1700, THHN: 0.1500, RHW: 0.2000, XHHW: 0.1400 },
+  "2/0AWG(70 mm2)": { THW: 0.1900, THHN: 0.1700, RHW: 0.2200, XHHW: 0.1600 },
+  "3/0AWG(95 mm2)": { THW: 0.2100, THHN: 0.1900, RHW: 0.2400, XHHW: 0.1800 },
+  "4/0AWG(120 mm2)": { THW: 0.2300, THHN: 0.2100, RHW: 0.2600, XHHW: 0.2000 },
+  "250 Kcmill": { THW: 0.2600, THHN: 0.2400, RHW: 0.2800, XHHW: 0.2200 },
+  "300 Kcmill": { THW: 0.2900, THHN: 0.2700, RHW: 0.3100, XHHW: 0.2500 },
+  "350 Kcmill": { THW: 0.3200, THHN: 0.3000, RHW: 0.3400, XHHW: 0.2800 },
+  "400 Kcmill": { THW: 0.3500, THHN: 0.3300, RHW: 0.3700, XHHW: 0.3100 },
+  "500 Kcmill": { THW: 0.4000, THHN: 0.3800, RHW: 0.4200, XHHW: 0.3600 },
+  "600 Kcmill": { THW: 0.4500, THHN: 0.4300, RHW: 0.4700, XHHW: 0.4100 },
+  "700 Kcmill": { THW: 0.5000, THHN: 0.4800, RHW: 0.5200, XHHW: 0.4600 },
+  "750 Kcmill": { THW: 0.5250, THHN: 0.5000, RHW: 0.5400, XHHW: 0.4800 },
+  "800 Kcmill": { THW: 0.5500, THHN: 0.5300, RHW: 0.5600, XHHW: 0.5000 },
+  "900 Kcmill": { THW: 0.6000, THHN: 0.5800, RHW: 0.6100, XHHW: 0.5500 },
+  "1000 Kcmill": { THW: 0.6500, THHN: 0.6300, RHW: 0.6600, XHHW: 0.6000 }
+};
 
   const conduitSizes = {
-    ENT: [ { size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }, { size: 3, maxFill: 1.25 } ],
-    FMC: [ { size: 2, maxFill: 0.31 }, { size: 3, maxFill: 0.62 } ],
-    IMC: [ { size: 3, maxFill: 0.40 }, { size: 4, maxFill: 1.00 } ]
+    EMT: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }, { size: 3, maxFill: 1.25 }],
+    ENT: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }, { size: 3, maxFill: 1.25 }],
+    FMC: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }],
+    IMC: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }],
+    LFNC_A: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }],
+    LFNC_B: [{ size: 1, maxFill: 0.53 }],
+    LFMC: [{ size: 1, maxFill: 0.53 }],
+    RMC: [{ size: 1, maxFill: 0.53 }],
+    PVC40: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }],
+    PVC80: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }]
   };
 
   const insulationTypes = ["THW", "THHN", "RHW", "XHHW"];
@@ -152,10 +193,10 @@
     tr.innerHTML = `
       <td><input type="number" min="1" value="1" onchange="updateArea(this)"></td>
       <td><select onchange="updateArea(this)">
-        ${wireSizeOptions.map(w => `<option value="${w}">${w}</option>`).join('')}
+        ${wireSizeOptions.map(w => `<option value="${w}">${w}</option>`).join("")}
       </select></td>
       <td><select onchange="updateArea(this)">
-        ${insulationTypes.map(i => `<option value="${i}">${i}</option>`).join('')}
+        ${insulationTypes.map(i => `<option value="${i}">${i}</option>`).join("")}
       </select></td>
       <td class="area">0.0000</td>
       <td><button onclick="removeRow(this)">Delete</button></td>
@@ -169,9 +210,12 @@
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input type="number" min="1" value="1" onchange="updateArea(this)"></td>
-      <td><select><option value="LV">LV</option><option value="Fiber">Fiber</option></select></td>
+      <td><select>
+        <option value="LV">LV</option>
+        <option value="Fiber">Fiber</option>
+      </select></td>
       <td><select onchange="updateArea(this)">
-        ${wireSizeOptions.map(w => `<option value="${w}">${w}</option>`).join('')}
+        ${wireSizeOptions.map(w => `<option value="${w}">${w}</option>`).join("")}
       </select></td>
       <td class="area">0.0000</td>
       <td><button onclick="removeRow(this)">Delete</button></td>
@@ -180,22 +224,20 @@
     updateArea(tr.querySelector("select"));
   }
 
-  function removeRow(button) {
-    button.closest("tr").remove();
+  function removeRow(btn) {
+    btn.closest("tr").remove();
     updateTotals();
   }
 
-  function updateArea(element) {
-    const row = element.closest("tr");
+  function updateArea(el) {
+    const row = el.closest("tr");
     const count = parseInt(row.querySelector("input").value) || 0;
     const selects = row.querySelectorAll("select");
     const wireSize = selects[0].value;
     const insulation = selects[1] ? selects[1].value : "THW";
-    const areaCell = row.querySelector(".area");
-
     const unitArea = wireSizes[wireSize]?.[insulation] || 0;
-    const totalArea = unitArea * count;
-    areaCell.textContent = totalArea.toFixed(4);
+    const totalArea = count * unitArea;
+    row.querySelector(".area").textContent = totalArea.toFixed(4);
     updateTotals();
   }
 
@@ -203,18 +245,25 @@
     let totalArea = 0;
     let totalConductors = 0;
 
-    document.querySelectorAll("#electricalTable tbody tr, #auxiliaryTable tbody tr").forEach(row => {
-      const count = parseInt(row.querySelector("input")?.value || 0);
-      const area = parseFloat(row.querySelector(".area")?.textContent || 0);
-      totalConductors += count;
-      totalArea += area;
-    });
+    if (!document.getElementById("electricalSection").classList.contains("hidden")) {
+      document.querySelectorAll("#electricalTable tbody tr").forEach(row => {
+        const count = parseInt(row.querySelector("input").value) || 0;
+        const area = parseFloat(row.querySelector(".area").textContent) || 0;
+        totalConductors += count;
+        totalArea += area;
+      });
+    }
 
-    let fillRatio = 1;
-    if (totalConductors === 1) fillRatio = 0.53;
-    else if (totalConductors === 2) fillRatio = 0.31;
-    else fillRatio = 0.40;
+    if (!document.getElementById("auxiliarySection").classList.contains("hidden")) {
+      document.querySelectorAll("#auxiliaryTable tbody tr").forEach(row => {
+        const count = parseInt(row.querySelector("input").value) || 0;
+        const area = parseFloat(row.querySelector(".area").textContent) || 0;
+        totalConductors += count;
+        totalArea += area;
+      });
+    }
 
+    let fillRatio = totalConductors === 1 ? 0.53 : (totalConductors === 2 ? 0.31 : 0.40);
     const requiredArea = totalArea / fillRatio;
     const conduitType = document.getElementById("conduitType").value;
     const options = conduitSizes[conduitType] || [];
@@ -228,21 +277,16 @@
     }
 
     document.getElementById("result").innerHTML = `
-      <strong>Total Conductors:</strong> ${totalConductors} <br>
-      <strong>Total Area of Conductors:</strong> ${totalArea.toFixed(4)} in² <br>
-      <strong>NEC Fill Percentage:</strong> ${Math.round(fillRatio * 100)}% <br>
-      <strong>Required Area (with Fill):</strong> ${requiredArea.toFixed(4)} in² <br>
+      <strong>Total Conductors:</strong> ${totalConductors}<br>
+      <strong>Total Area of Conductors:</strong> ${totalArea.toFixed(4)} in²<br>
+      <strong>NEC Fill %:</strong> ${(fillRatio * 100).toFixed(0)}%<br>
+      <strong>Required Area w/ Fill:</strong> ${requiredArea.toFixed(4)} in²<br>
       <strong>Suggested Conduit Size:</strong> ${suggestedSize}
     `;
   }
 
-  // Initialize
-  window.onload = () => {
-    addElectricalRow();
-    addAuxiliaryRow();
-    toggleTables(); // Ensure only one table shows based on dropdown
-  };
+  // Initial Rows (only electrical visible on load)
+  addElectricalRow();
 </script>
-
 </body>
 </html>
