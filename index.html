@@ -2,210 +2,229 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Conduit Size Calculator</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    select, input { margin: 5px; padding: 5px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background-color: #f0f0f0; }
-    .hidden { display: none; }
-    .summary-box {
-      background: #cfe2f3;
-      padding: 15px;
-      margin-top: 20px;
-      border: 2px solid #000;
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f8f9fa;
+    }
+    h2, h3 {
+      color: #2c3e50;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
       text-align: center;
     }
-    .add-button {
-      margin-top: 10px;
-      padding: 8px 16px;
-      background-color: #4CAF50;
+    select, input {
+      padding: 4px;
+      width: 100%;
+    }
+    .hidden {
+      display: none;
+    }
+    .delete-btn {
+      background: #e74c3c;
       color: white;
       border: none;
+      padding: 4px 8px;
       cursor: pointer;
+      border-radius: 4px;
+    }
+    .warning {
+      color: red;
+      font-weight: bold;
+    }
+    button {
+      margin-top: 10px;
+      padding: 6px 12px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #pecRef {
+      margin-top: 20px;
+      padding: 10px;
+      background: #ecf0f1;
+      border: 1px dashed #7f8c8d;
     }
   </style>
 </head>
 <body>
 
-  <h2>Conduit Size Calculator</h2>
+<h2>Conduit Size Calculator</h2>
 
-  <label>Calculator Type:
-    <select id="calcType" onchange="toggleTables()">
-      <option value="electrical">Electrical</option>
-      <option value="auxiliary">Auxiliary</option>
-      <option value="both">Both</option>
-    </select>
-  </label>
+<label for="calcType">Calculation Type:</label>
+<select id="calcType" onchange="toggleTables()">
+  <option value="electrical">Electrical</option>
+  <option value="auxiliary">Auxiliary</option>
+</select>
 
-  <div id="electricalTable">
-    <h3>Electrical Conductors</h3>
-    <table>
-      <thead>
-        <tr><th>No. of Conductors</th><th>Size</th><th>Type</th><th>Area</th></tr>
-      </thead>
-      <tbody id="electricalBody">
-      </tbody>
-    </table>
-    <button class="add-button" onclick="addElectricalRow()">Add Electrical Row</button>
-  </div>
+<table id="electricalTable">
+  <thead>
+    <tr>
+      <th>Qty</th>
+      <th>Size</th>
+      <th>Insulation</th>
+      <th>Area (in²)</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="electricalBody"></tbody>
+</table>
+<button onclick="addElectricalRow()">➕ Add Electrical</button>
 
-  <div id="auxiliaryTable" class="hidden">
-    <h3>Auxiliary Cables</h3>
-    <table>
-      <thead>
-        <tr><th>No. of Cables</th><th>Type</th><th>Size</th><th>Area</th></tr>
-      </thead>
-      <tbody id="auxBody">
-      </tbody>
-    </table>
-    <button class="add-button" onclick="addAuxRow()">Add Auxiliary Row</button>
-  </div>
+<table id="auxiliaryTable" class="hidden">
+  <thead>
+    <tr>
+      <th>Qty</th>
+      <th>Type</th>
+      <th>Size</th>
+      <th>Area (in²)</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="auxBody"></tbody>
+</table>
+<button onclick="addAuxRow()">➕ Add Auxiliary</button>
 
-  <div class="summary-box">
-    <div><strong>Total Area:</strong> <span id="totalArea">0</span></div>
-    <div><strong>Conduit Type:</strong>
-      <select id="conduitType">
-        <option value="EMT">EMT</option>
-        <option value="ENT">ENT</option>
-        <option value="FMC">FMC</option>
-        <option value="IMC">IMC</option>
-        <option value="LFNC_A">LFNC_A</option>
-        <option value="LFNC_B">LFNC_B</option>
-        <option value="LFMC">LFMC</option>
-        <option value="RMC">RMC</option>
-        <option value="PVC40">PVC40</option>
-        <option value="PVC80">PVC80</option>
-      </select>
-    </div>
-    <div><strong>Minimum Conduit Size:</strong> <span id="minSize">--</span></div>
-  </div>
+<br><br>
+<label for="conduitType">Conduit Type:</label>
+<select id="conduitType" onchange="calculateTotal()">
+  <option value="EMT">EMT</option>
+  <option value="IMC">IMC</option>
+  <option value="RMC">RMC</option>
+  <option value="PVC40">PVC Schedule 40</option>
+  <option value="PVC80">PVC Schedule 80</option>
+</select>
 
-  <script>
-    const areaLookup = {
-      '14 AWG(2.5 mm2)': 0.0130,
-      '12AWG(4 mm2)': 0.0201,
-      '10AWG(6 mm2)': 0.0314,
-      '8AWG(10 mm2)': 0.0456,
-      '6AWG(16 mm2)': 0.0658,
-      '4AWG(25 mm2)': 0.0824,
-      '3AWG(35 mm2)': 0.0974,
-      '2AWG(35 mm2)': 0.1158,
-      '1AWG(50 mm2)': 0.1341,
-      '1/0AWG(55 mm2)': 0.1707,
-      '2/0AWG(70 mm2)': 0.1963,
-      '3/0AWG(95 mm2)': 0.2271,
-      '4/0AWG(120 mm2)': 0.2604,
-      '250 Kcmill': 0.3160,
-      '300 Kcmill': 0.3550,
-      '350 Kcmill': 0.3950,
-      '400 Kcmill': 0.4360,
-      '500 Kcmill': 0.4840,
-      '600 Kcmill': 0.5590,
-      '700 Kcmill': 0.6080,
-      '750 Kcmill': 0.6300,
-      '800 Kcmill': 0.6520,
-      '900 Kcmill': 0.6980,
-      '1000 Kcmill': 0.7400,
-      'Fiber-2f': 0.0200,
-      'Fiber-4f': 0.0300,
-      'Fiber-6f': 0.0400,
-      'Fiber-8f': 0.0500,
-      'Fiber-12f': 0.0600,
-      'Fiber-24f': 0.0800,
-      'Fiber-36f': 0.1000,
-      'Fiber-48f': 0.1200,
-      'Fiber-72f': 0.1600,
-      'Fiber-96f': 0.2000,
-      'Fiber-144f': 0.2400
-    };
+<h3>Summary</h3>
+<div><strong>Total Area:</strong> <span id="totalArea">0</span> in²</div>
+<div><strong>Minimum Conduit Size:</strong> <span id="minSize">--</span></div>
+<div id="fillWarning" class="warning"></div>
 
-    function toggleTables() {
-      const type = document.getElementById('calcType').value;
-      document.getElementById('electricalTable').classList.toggle('hidden', type === 'auxiliary');
-      document.getElementById('auxiliaryTable').classList.toggle('hidden', type === 'electrical');
-      calculateTotal();
-    }
+<button onclick="window.print()">🖨️ Print / Save as PDF</button>
 
-    function calculateTotal() {
-      let total = 0;
+<div id="pecRef">
+  <h3>PEC Conduit Fill Reference</h3>
+  <ul>
+    <li><strong>1 wire</strong>: up to 53% fill</li>
+    <li><strong>2 wires</strong>: up to 31% fill</li>
+    <li><strong>3+ wires</strong>: up to <strong>40% fill (used here)</strong></li>
+    <li>Check PEC Table 10A for full details</li>
+  </ul>
+</div>
 
-      document.querySelectorAll('#electricalTable tbody tr').forEach(row => {
-        const qty = parseInt(row.cells[0].querySelector('input').value) || 0;
-        const size = row.cells[1].querySelector('select').value;
-        const key = size;
-        const area = areaLookup[key] || 0;
-        const rowArea = qty * area;
-        row.cells[3].textContent = rowArea.toFixed(4);
-        total += rowArea;
-      });
+<script>
+  const areaLookup = {
+    '14 AWG(2.5 mm2)': 0.0130, '12AWG(4 mm2)': 0.0201, '10AWG(6 mm2)': 0.0314,
+    '8AWG(10 mm2)': 0.0456, '6AWG(16 mm2)': 0.0658, '4AWG(25 mm2)': 0.0824,
+    '3AWG(35 mm2)': 0.0974, '2AWG(35 mm2)': 0.1158, '1AWG(50 mm2)': 0.1341,
+    '1/0AWG(55 mm2)': 0.1707, '2/0AWG(70 mm2)': 0.1963, '3/0AWG(95 mm2)': 0.2271,
+    '4/0AWG(120 mm2)': 0.2604, '250 Kcmill': 0.3160, '300 Kcmill': 0.3550,
+    '350 Kcmill': 0.3950, '400 Kcmill': 0.4360, '500 Kcmill': 0.4840,
+    '600 Kcmill': 0.5590, '700 Kcmill': 0.6080, '750 Kcmill': 0.6300,
+    '800 Kcmill': 0.6520, '900 Kcmill': 0.6980, '1000 Kcmill': 0.7400,
+    'Fiber-2f': 0.0200, 'Fiber-4f': 0.0300, 'Fiber-6f': 0.0400, 'Fiber-8f': 0.0500,
+    'Fiber-12f': 0.0600, 'Fiber-24f': 0.0800, 'Fiber-36f': 0.1000, 'Fiber-48f': 0.1200,
+    'Fiber-72f': 0.1600, 'Fiber-96f': 0.2000, 'Fiber-144f': 0.2400
+  };
 
-      document.querySelectorAll('#auxiliaryTable tbody tr').forEach(row => {
-        const qty = parseInt(row.cells[0].querySelector('input').value) || 0;
-        const type = row.cells[1].querySelector('select').value;
-        const size = row.cells[2].querySelector('select').value;
-        const key = `${type}-${size}`;
-        const area = areaLookup[key] || 0;
-        const rowArea = qty * area;
-        row.cells[3].textContent = rowArea.toFixed(4);
-        total += rowArea;
-      });
+  const conduitCapacity = {
+    'EMT': 2.0, 'IMC': 2.0, 'RMC': 2.0, 'PVC40': 2.0, 'PVC80': 2.0
+  };
 
-      document.getElementById('totalArea').textContent = total.toFixed(3);
+  function toggleTables() {
+    const type = document.getElementById('calcType').value;
+    document.getElementById('electricalTable').classList.toggle('hidden', type === 'auxiliary');
+    document.getElementById('auxiliaryTable').classList.toggle('hidden', type === 'electrical');
+    calculateTotal();
+  }
 
-      const minSize = (total <= 2.0) ? '1"' : (total <= 3.5 ? '2"' : (total <= 6.0 ? '3"' : '5"'));
-      document.getElementById('minSize').textContent = minSize;
-    }
+  function calculateTotal() {
+    let total = 0;
 
-    function addElectricalRow() {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td><input type="number" value="1" onchange="calculateTotal()"></td>
-        <td>
-          <select onchange="calculateTotal()">
-            ${Object.keys(areaLookup).filter(k => !k.includes('Fiber')).map(k => `<option>${k}</option>`).join('')}
-          </select>
-        </td>
-        <td>
-          <select onchange="calculateTotal()">
-            <option value="THHN">THHN</option>
-            <option value="THW">THW</option>
-          </select>
-        </td>
-        <td class="area">0</td>
-      `;
-      document.getElementById('electricalBody').appendChild(row);
-      calculateTotal();
-    }
+    document.querySelectorAll('#electricalBody tr').forEach(row => {
+      const qty = parseInt(row.cells[0].querySelector('input').value) || 0;
+      const size = row.cells[1].querySelector('select').value;
+      const area = areaLookup[size] || 0;
+      const rowArea = qty * area;
+      row.cells[3].textContent = rowArea.toFixed(4);
+      total += rowArea;
+    });
 
-    function addAuxRow() {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td><input type="number" value="1" onchange="calculateTotal()"></td>
-        <td>
-          <select onchange="calculateTotal()">
-            <option value="Fiber">Fiber</option>
-            <option value="LV">LV</option>
-          </select>
-        </td>
-        <td>
-          <select onchange="calculateTotal()">
-            ${["2f","4f","6f","8f","12f","24f","36f","48f","72f","96f","144f"].map(size => `<option>${size}</option>`).join('')}
-          </select>
-        </td>
-        <td class="area">0</td>
-      `;
-      document.getElementById('auxBody').appendChild(row);
-      calculateTotal();
-    }
+    document.querySelectorAll('#auxBody tr').forEach(row => {
+      const qty = parseInt(row.cells[0].querySelector('input').value) || 0;
+      const type = row.cells[1].querySelector('select').value;
+      const size = row.cells[2].querySelector('select').value;
+      const key = `${type}-${size}`;
+      const area = areaLookup[key] || 0;
+      const rowArea = qty * area;
+      row.cells[3].textContent = rowArea.toFixed(4);
+      total += rowArea;
+    });
 
-    window.onload = () => {
-      addElectricalRow();
-      addAuxRow();
-      toggleTables();
-    };
-  </script>
+    document.getElementById('totalArea').textContent = total.toFixed(3);
+    const conduit = document.getElementById('conduitType').value;
+    const capacity = conduitCapacity[conduit] || 2.0;
+    const fillLimit = 0.4 * capacity;
+
+    document.getElementById('fillWarning').textContent = total > fillLimit
+      ? `⚠️ Exceeds 40% fill (${total.toFixed(3)} in² > ${fillLimit.toFixed(3)} in²)`
+      : '';
+
+    const minSize = (total <= 2.0) ? '1"' : (total <= 3.5 ? '2"' : (total <= 6.0 ? '3"' : '5"');
+    document.getElementById('minSize').textContent = minSize;
+  }
+
+  function addElectricalRow() {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input type="number" value="1" onchange="calculateTotal()"></td>
+      <td><select onchange="calculateTotal()">
+        ${Object.keys(areaLookup).filter(k => !k.includes('Fiber')).map(k => `<option>${k}</option>`).join('')}
+      </select></td>
+      <td><select onchange="calculateTotal()">
+        <option>RHW</option><option>THHN</option><option>THW</option><option>XHHW</option>
+      </select></td>
+      <td class="area">0</td>
+      <td><button class="delete-btn" onclick="this.closest('tr').remove(); calculateTotal();">❌</button></td>
+    `;
+    document.getElementById('electricalBody').appendChild(row);
+    calculateTotal();
+  }
+
+  function addAuxRow() {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input type="number" value="1" onchange="calculateTotal()"></td>
+      <td><select onchange="calculateTotal()">
+        <option value="Fiber">Fiber</option><option value="LV">LV</option>
+      </select></td>
+      <td><select onchange="calculateTotal()">
+        ${["2f","4f","6f","8f","12f","24f","36f","48f","72f","96f","144f"].map(s => `<option>${s}</option>`).join('')}
+      </select></td>
+      <td class="area">0</td>
+      <td><button class="delete-btn" onclick="this.closest('tr').remove(); calculateTotal();">❌</button></td>
+    `;
+    document.getElementById('auxBody').appendChild(row);
+    calculateTotal();
+  }
+
+  window.onload = () => {
+    addElectricalRow();
+    toggleTables();
+  };
+</script>
+
 </body>
 </html>
