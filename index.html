@@ -9,41 +9,33 @@
       background: #f7f7f7;
       padding: 20px;
     }
-
     h2, h3 {
       color: #003366;
     }
-
     table {
       border-collapse: collapse;
       width: 100%;
       margin-bottom: 15px;
     }
-
     th, td {
       border: 1px solid #999;
       padding: 8px;
       text-align: center;
     }
-
     th {
       background-color: #003366;
       color: white;
     }
-
     #electricalTable tbody tr {
       background-color: #fff9db;
     }
-
     #auxiliaryTable tbody tr {
       background-color: #e0f0ff;
     }
-
     input[type="number"], select {
       width: 100%;
       padding: 4px;
     }
-
     button {
       padding: 6px 12px;
       margin: 5px 0;
@@ -53,15 +45,12 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
     button:hover {
       background-color: #0066cc;
     }
-
     .hidden {
       display: none;
     }
-
     #result {
       background: #e6f7ff;
       border: 1px solid #0099cc;
@@ -180,7 +169,7 @@
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input type="number" min="1" value="1" onchange="updateArea(this)"></td>
-      <td><select><option value="Control">Control</option><option value="Signal">Signal</option></select></td>
+      <td><select><option value="LV">LV</option><option value="Fiber">Fiber</option></select></td>
       <td><select onchange="updateArea(this)">
         ${wireSizeOptions.map(w => `<option value="${w}">${w}</option>`).join('')}
       </select></td>
@@ -248,8 +237,12 @@
   }
 
   // Initialize
-  addElectricalRow();
-  addAuxiliaryRow();
+  window.onload = () => {
+    addElectricalRow();
+    addAuxiliaryRow();
+    toggleTables(); // Ensure only one table shows based on dropdown
+  };
 </script>
+
 </body>
 </html>
