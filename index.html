@@ -41,6 +41,7 @@
     .warning {
       color: red;
       font-weight: bold;
+      margin-top: 10px;
     }
     button {
       margin-top: 10px;
@@ -69,6 +70,7 @@
   <option value="auxiliary">Auxiliary</option>
 </select>
 
+<!-- Electrical Table -->
 <table id="electricalTable">
   <thead>
     <tr>
@@ -83,6 +85,7 @@
 </table>
 <button onclick="addElectricalRow()">➕ Add Electrical</button>
 
+<!-- Auxiliary Table -->
 <table id="auxiliaryTable" class="hidden">
   <thead>
     <tr>
@@ -178,11 +181,14 @@
     const capacity = conduitCapacity[conduit] || 2.0;
     const fillLimit = 0.4 * capacity;
 
-    document.getElementById('fillWarning').textContent = total > fillLimit
-      ? `⚠️ Exceeds 40% fill (${total.toFixed(3)} in² > ${fillLimit.toFixed(3)} in²)`
-      : '';
+    const warning = document.getElementById('fillWarning');
+    if (total > fillLimit) {
+      warning.textContent = `⚠️ Exceeds 40% fill (${total.toFixed(3)} in² > ${fillLimit.toFixed(3)} in²)`;
+    } else {
+      warning.textContent = '';
+    }
 
-    const minSize = (total <= 2.0) ? '1"' : (total <= 3.5 ? '2"' : (total <= 6.0 ? '3"' : '5"');
+    const minSize = (total <= 2.0) ? '1"' : (total <= 3.5 ? '2"' : (total <= 6.0 ? '3"' : '4"+');
     document.getElementById('minSize').textContent = minSize;
   }
 
