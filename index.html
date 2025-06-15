@@ -9,33 +9,41 @@
       background: #f7f7f7;
       padding: 20px;
     }
+
     h2, h3 {
       color: #003366;
     }
+
     table {
       border-collapse: collapse;
       width: 100%;
       margin-bottom: 15px;
     }
+
     th, td {
       border: 1px solid #999;
       padding: 8px;
       text-align: center;
     }
+
     th {
       background-color: #003366;
       color: white;
     }
+
     #electricalTable tbody tr {
       background-color: #fff9db;
     }
+
     #auxiliaryTable tbody tr {
       background-color: #e0f0ff;
     }
+
     input[type="number"], select {
       width: 100%;
       padding: 4px;
     }
+
     button {
       padding: 6px 12px;
       margin: 5px 0;
@@ -45,12 +53,15 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
     button:hover {
       background-color: #0066cc;
     }
+
     .hidden {
       display: none;
     }
+
     #result {
       background: #e6f7ff;
       border: 1px solid #0099cc;
@@ -111,16 +122,9 @@
 <h3>📦 Conduit Selection</h3>
 <label for="conduitType"><strong>Conduit Type:</strong></label>
 <select id="conduitType" onchange="updateTotals()">
-  <option value="EMT">EMT</option>
   <option value="ENT">ENT</option>
   <option value="FMC">FMC</option>
   <option value="IMC">IMC</option>
-  <option value="LFNC_A">LFNC_A</option>
-  <option value="LFNC_B">LFNC_B</option>
-  <option value="LFMC">LFMC</option>
-  <option value="RMC">RMC</option>
-  <option value="PVC40">PVC40</option>
-  <option value="PVC80">PVC80</option>
 </select>
 
 <!-- Results -->
@@ -138,13 +142,9 @@
   };
 
   const conduitSizes = {
-    EMT: [ { size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }, { size: 3, maxFill: 1.25 } ],
     ENT: [ { size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }, { size: 3, maxFill: 1.25 } ],
     FMC: [ { size: 2, maxFill: 0.31 }, { size: 3, maxFill: 0.62 } ],
-    IMC: [ { size: 3, maxFill: 0.40 }, { size: 4, maxFill: 1.00 } ],
-    LFNC_A: [], LFNC_B: [], LFMC: [],
-    RMC: [ { size: 2, maxFill: 0.31 }, { size: 3, maxFill: 0.62 } ],
-    PVC40: [], PVC80: []
+    IMC: [ { size: 3, maxFill: 0.40 }, { size: 4, maxFill: 1.00 } ]
   };
 
   const insulationTypes = ["THW", "THHN", "RHW", "XHHW"];
@@ -247,10 +247,9 @@
     `;
   }
 
-  // Initial rows for demonstration
+  // Initialize
   addElectricalRow();
   addAuxiliaryRow();
 </script>
-
 </body>
 </html>
