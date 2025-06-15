@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conduit Size Calculator</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="max-w-xl mx-auto p-6 mt-10 bg-white rounded-2xl shadow-lg">
+    <h1 class="text-2xl font-bold text-center text-blue-700 mb-4">Conduit Size Calculator</h1>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Number of Conductors</label>
+        <input id="numConductors" type="number" min="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Conductor Size</label>
+        <select id="conductorSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+          <option value="0.1158">2 AWG (35 mm²)</option>
+          <option value="5.9748">250 Kcmil</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Insulation Type</label>
+        <select id="insulationType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+          <option>THHN</option>
+          <option>THW</option>
+          <option>RHW</option>
+          <option>XHHW</option>
+        </select>
+      </div>
+
+      <div class="pt-4">
+        <button onclick="calculateArea()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl shadow">Calculate</button>
+      </div>
+
+      <div id="result" class="mt-4 text-center text-lg font-semibold text-gray-700"></div>
+    </div>
+  </div>
+
+  <script>
+    function calculateArea() {
+      const num = parseInt(document.getElementById('numConductors').value);
+      const areaPerWire = parseFloat(document.getElementById('conductorSize').value);
+
+      if (isNaN(num) || isNaN(areaPerWire)) {
+        document.getElementById('result').textContent = 'Please enter valid input.';
+        return;
+      }
+
+      const totalArea = (num * areaPerWire).toFixed(4);
+      document.getElementById('result').textContent = `Total Conductor Area: ${totalArea} in²`;
+    }
+  </script>
+</body>
+</html>
