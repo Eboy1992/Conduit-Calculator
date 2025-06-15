@@ -242,48 +242,56 @@
   }
 
   function updateTotals() {
-    let totalArea = 0;
-    let totalConductors = 0;
+  let totalArea = 0;
+  let totalConductors = 0;
 
-    if (!document.getElementById("electricalSection").classList.contains("hidden")) {
-      document.querySelectorAll("#electricalTable tbody tr").forEach(row => {
-        const count = parseInt(row.querySelector("input").value) || 0;
-        const area = parseFloat(row.querySelector(".area").textContent) || 0;
-        totalConductors += count;
-        totalArea += area;
-      });
-    }
-
-    if (!document.getElementById("auxiliarySection").classList.contains("hidden")) {
-      document.querySelectorAll("#auxiliaryTable tbody tr").forEach(row => {
-        const count = parseInt(row.querySelector("input").value) || 0;
-        const area = parseFloat(row.querySelector(".area").textContent) || 0;
-        totalConductors += count;
-        totalArea += area;
-      });
-    }
-
-    let fillRatio = totalConductors === 1 ? 0.53 : (totalConductors === 2 ? 0.31 : 0.40);
-    const requiredArea = totalArea / fillRatio;
-    const conduitType = document.getElementById("conduitType").value;
-    const options = conduitSizes[conduitType] || [];
-
-    let suggestedSize = "Not available";
-    for (let opt of options) {
-      if (opt.maxFill >= requiredArea) {
-        suggestedSize = `${opt.size} (Max Fill ${opt.maxFill} in²)`;
-        break;
-      }
-    }
-
-    document.getElementById("result").innerHTML = `
-      <strong>Total Conductors:</strong> ${totalConductors}<br>
-      <strong>Total Area of Conductors:</strong> ${totalArea.toFixed(4)} in²<br>
-      <strong>NEC Fill %:</strong> ${(fillRatio * 100).toFixed(0)}%<br>
-      <strong>Required Area w/ Fill:</strong> ${requiredArea.toFixed(4)} in²<br>
-      <strong>Suggested Conduit Size:</strong> ${suggestedSize}
-    `;
+  if (!document.getElementById("electricalSection").classList.contains("hidden")) {
+    document.querySelectorAll("#electricalTable tbody tr").forEach(row => {
+      const count = parseInt(row.querySelector("input").value) || 0;
+      const area = parseFloat(row.querySelector(".area").textContent) || 0;
+      totalConductors += count;
+      totalArea += area;
+    });
   }
+
+  if (!document.getElementById("auxiliarySection").classList.contains("hidden")) {
+    document.querySelectorAll("#auxiliaryTable tbody tr").forEach(row => {
+      const count = parseInt(row.querySelector("input").value) || 0;
+      const area = parseFloat(row.querySelector(".area").textContent) || 0;
+      totalConductors += count;
+      totalArea += area;
+    });
+  }
+
+  // If area is zero, clear result
+  if (totalArea <= 0) {
+    document.getElementById("result").innerHTML = "";
+    return;
+  }
+
+  let fillRatio = totalConductors === 1 ? 0.53 : (totalConductors === 2 ? 0.31 : 0.40);
+  const requiredArea = totalArea / fillRatio;
+  const conduitType = document.getElementById("conduitType").value;
+  const options = conduitSizes[conduitType] || [];
+
+  // VLOOKUP-style logic
+  let suggestedSize = "Not available";
+  for (let i = 0; i < options.length; i++) {
+    if (options[i].maxFill >= requiredArea) {
+      suggestedSize = `${options[i].size} (Max Fill ${options[i].maxFill} in²)`;
+      break;
+    }
+  }
+
+  document.getElementById("result").innerHTML = `
+    <strong>Total Conductors:</strong> ${totalConductors}<br>
+    <strong>Total Area of Conductors:</strong> ${totalArea.toFixed(4)} in²<br>
+    <strong>NEC Fill %:</strong> ${(fillRatio * 100).toFixed(0)}%<br>
+    <strong>Required Area w/ Fill:</strong> ${requiredArea.toFixed(4)} in²<br>
+    <strong>Suggested Conduit Size:</strong> ${suggestedSize}
+  `;
+}
+
 
   // Initial Rows (only electrical visible on load)
   addElectricalRow();
