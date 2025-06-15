@@ -18,6 +18,14 @@
       border: 2px solid #000;
       text-align: center;
     }
+    .add-button {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -39,24 +47,9 @@
         <tr><th>No. of Conductors</th><th>Size</th><th>Type</th><th>Area</th></tr>
       </thead>
       <tbody id="electricalBody">
-        <tr>
-          <td><input type="number" value="1" onchange="calculateTotal()"></td>
-          <td>
-            <select onchange="calculateTotal()">
-              <option value="2AWG">2AWG</option>
-              <option value="250Kcmil">250Kcmil</option>
-            </select>
-          </td>
-          <td>
-            <select onchange="calculateTotal()">
-              <option value="THHN">THHN</option>
-              <option value="THW">THW</option>
-            </select>
-          </td>
-          <td class="area">0</td>
-        </tr>
       </tbody>
     </table>
+    <button class="add-button" onclick="addElectricalRow()">Add Electrical Row</button>
   </div>
 
   <div id="auxiliaryTable" class="hidden">
@@ -66,33 +59,25 @@
         <tr><th>No. of Cables</th><th>Type</th><th>Size</th><th>Area</th></tr>
       </thead>
       <tbody id="auxBody">
-        <tr>
-          <td><input type="number" value="1" onchange="calculateTotal()"></td>
-          <td>
-            <select onchange="calculateTotal()">
-              <option value="Fiber">Fiber</option>
-              <option value="LV">LV</option>
-            </select>
-          </td>
-          <td>
-            <select onchange="calculateTotal()">
-              <option value="2f">2f</option>
-              <option value="CAT5">CAT5</option>
-            </select>
-          </td>
-          <td class="area">0</td>
-        </tr>
       </tbody>
     </table>
+    <button class="add-button" onclick="addAuxRow()">Add Auxiliary Row</button>
   </div>
 
   <div class="summary-box">
     <div><strong>Total Area:</strong> <span id="totalArea">0</span></div>
     <div><strong>Conduit Type:</strong>
       <select id="conduitType">
-        <option value="RMC">RMC</option>
         <option value="EMT">EMT</option>
+        <option value="ENT">ENT</option>
+        <option value="FMC">FMC</option>
         <option value="IMC">IMC</option>
+        <option value="LFNC_A">LFNC_A</option>
+        <option value="LFNC_B">LFNC_B</option>
+        <option value="LFMC">LFMC</option>
+        <option value="RMC">RMC</option>
+        <option value="PVC40">PVC40</option>
+        <option value="PVC80">PVC80</option>
       </select>
     </div>
     <div><strong>Minimum Conduit Size:</strong> <span id="minSize">--</span></div>
@@ -100,10 +85,41 @@
 
   <script>
     const areaLookup = {
-      '2AWG': 0.1158,
-      '250Kcmil': 0.4596,
-      'Fiber-2f': 0.0266,
-      'LV-CAT5': 0.0346
+      '14 AWG(2.5 mm2)': 0.0130,
+      '12AWG(4 mm2)': 0.0201,
+      '10AWG(6 mm2)': 0.0314,
+      '8AWG(10 mm2)': 0.0456,
+      '6AWG(16 mm2)': 0.0658,
+      '4AWG(25 mm2)': 0.0824,
+      '3AWG(35 mm2)': 0.0974,
+      '2AWG(35 mm2)': 0.1158,
+      '1AWG(50 mm2)': 0.1341,
+      '1/0AWG(55 mm2)': 0.1707,
+      '2/0AWG(70 mm2)': 0.1963,
+      '3/0AWG(95 mm2)': 0.2271,
+      '4/0AWG(120 mm2)': 0.2604,
+      '250 Kcmill': 0.3160,
+      '300 Kcmill': 0.3550,
+      '350 Kcmill': 0.3950,
+      '400 Kcmill': 0.4360,
+      '500 Kcmill': 0.4840,
+      '600 Kcmill': 0.5590,
+      '700 Kcmill': 0.6080,
+      '750 Kcmill': 0.6300,
+      '800 Kcmill': 0.6520,
+      '900 Kcmill': 0.6980,
+      '1000 Kcmill': 0.7400,
+      'Fiber-2f': 0.0200,
+      'Fiber-4f': 0.0300,
+      'Fiber-6f': 0.0400,
+      'Fiber-8f': 0.0500,
+      'Fiber-12f': 0.0600,
+      'Fiber-24f': 0.0800,
+      'Fiber-36f': 0.1000,
+      'Fiber-48f': 0.1200,
+      'Fiber-72f': 0.1600,
+      'Fiber-96f': 0.2000,
+      'Fiber-144f': 0.2400
     };
 
     function toggleTables() {
@@ -143,8 +159,53 @@
       document.getElementById('minSize').textContent = minSize;
     }
 
-    window.onload = calculateTotal;
+    function addElectricalRow() {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><input type="number" value="1" onchange="calculateTotal()"></td>
+        <td>
+          <select onchange="calculateTotal()">
+            ${Object.keys(areaLookup).filter(k => !k.includes('Fiber')).map(k => `<option>${k}</option>`).join('')}
+          </select>
+        </td>
+        <td>
+          <select onchange="calculateTotal()">
+            <option value="THHN">THHN</option>
+            <option value="THW">THW</option>
+          </select>
+        </td>
+        <td class="area">0</td>
+      `;
+      document.getElementById('electricalBody').appendChild(row);
+      calculateTotal();
+    }
+
+    function addAuxRow() {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><input type="number" value="1" onchange="calculateTotal()"></td>
+        <td>
+          <select onchange="calculateTotal()">
+            <option value="Fiber">Fiber</option>
+            <option value="LV">LV</option>
+          </select>
+        </td>
+        <td>
+          <select onchange="calculateTotal()">
+            ${["2f","4f","6f","8f","12f","24f","36f","48f","72f","96f","144f"].map(size => `<option>${size}</option>`).join('')}
+          </select>
+        </td>
+        <td class="area">0</td>
+      `;
+      document.getElementById('auxBody').appendChild(row);
+      calculateTotal();
+    }
+
+    window.onload = () => {
+      addElectricalRow();
+      addAuxRow();
+      toggleTables();
+    };
   </script>
 </body>
 </html>
-
