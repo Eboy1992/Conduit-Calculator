@@ -1,241 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Conductor Sizing Calculator</title>
+  <meta charset="UTF-8" />
+  <title>Automatic Conductor Sizing Calculator</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background-color: #f2f2f2; }
-    .hidden { display: none; }
-    #result { font-weight: bold; }
-    button { padding: 6px 10px; cursor: pointer; }
-    select, input[type="number"] { padding: 4px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 20px;
+    }
+
+    h2, h3 {
+      color: #003366;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #002b45;
+      color: white;
+    }
+
+    #electricalTable tbody tr {
+      background-color: #fffbe6;
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      padding: 4px;
+    }
+
+    button {
+      padding: 6px 12px;
+      margin: 5px 0;
+      background-color: #003366;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0059b3;
+    }
+
+    #result {
+      background: #ffffff;
+      border: 1px solid #003366;
+      padding: 12px;
+      font-size: 1rem;
+    }
   </style>
 </head>
 <body>
 
-  <h2>Conductor Sizing Calculator</h2>
+<h2>Automatic Conductor Sizing Calculator</h2>
 
-  <label for="usageType">Usage Type:</label>
-  <select id="usageType" onchange="toggleTables()">
-    <option value="electrical">Electrical</option>
-    <option value="auxiliary">Auxiliary</option>
-  </select>
+<!-- Electrical Section -->
+<h3>⚡ Electrical</h3>
+<table id="electricalTable">
+  <thead>
+    <tr>
+      <th>Number of Conductors</th>
+      <th>Size of Conductor</th>
+      <th>Type of Insulation</th>
+      <th>Calculated Area (in²)</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<button onclick="addElectricalRow()">Add Electrical Row</button>
 
-  <label for="conduitType">Conduit Type:</label>
-  <select id="conduitType" onchange="updateTotals()">
-    <option value="EMT">EMT</option>
-    <option value="ENT">ENT</option>
-    <option value="FMC">FMC</option>
-    <option value="IMC">IMC</option>
-    <option value="LFNC_A">LFNC-A</option>
-    <option value="LFNC_B">LFNC-B</option>
-    <option value="LFMC">LFMC</option>
-    <option value="RMC">RMC</option>
-    <option value="PVC40">PVC Schedule 40</option>
-    <option value="PVC80">PVC Schedule 80</option>
-  </select>
+<!-- Conduit Type -->
+<h3>📦 Conduit Selection</h3>
+<label for="conduitType"><strong>Conduit Type:</strong></label>
+<select id="conduitType" onchange="updateTotals()">
+  <option value="EMT">EMT</option>
+  <option value="ENT">ENT</option>
+  <option value="FMC">FMC</option>
+  <option value="IMC">IMC</option>
+  <option value="LFNC_A">LFNC_A</option>
+  <option value="LFNC_B">LFNC_B</option>
+  <option value="LFMC">LFMC</option>
+  <option value="RMC">RMC</option>
+  <option value="PVC40">PVC40</option>
+  <option value="PVC80">PVC80</option>
+</select>
 
-  <div id="electricalSection">
-    <h3>Electrical Conductors</h3>
-    <button onclick="addElectricalRow()">Add Electrical Conductor</button>
-    <table id="electricalTable">
-      <thead>
-        <tr>
-          <th>Qty</th>
-          <th>Wire Size</th>
-          <th>Insulation</th>
-          <th>Area (in²)</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+<!-- Result -->
+<div id="result"></div>
 
-  <div id="auxiliarySection" class="hidden">
-    <h3>Auxiliary Cables</h3>
-    <button onclick="addAuxiliaryRow()">Add Auxiliary Cable</button>
-    <table id="auxiliaryTable">
-      <thead>
-        <tr>
-          <th>Qty</th>
-          <th>Type (LV / Fiber)</th>
-          <th>Size</th>
-          <th>Area (in²)</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+<script>
+  const wireSizes = {
+    "14 AWG(2.5 mm2)": { THW: 0.0139, THHN: 0.0097, RHW: 0.0293, XHHW: 0.0139 },
+    "12AWG(4 mm2)": { THW: 0.0181, THHN: 0.0133, RHW: 0.0353, XHHW: 0.0181 },
+    "10AWG(6 mm2)": { THW: 0.0243, THHN: 0.0211, RHW: 0.0437, XHHW: 0.0243 },
+    "8AWG(10 mm2)": { THW: 0.0437, THHN: 0.0366, RHW: 0.0835, XHHW: 0.0437 },
+    "6AWG(16 mm2)": { THW: 0.0726, THHN: 0.0507, RHW: 0.1041, XHHW: 0.0590 },
+    "4AWG(25 mm2)": { THW: 0.0973, THHN: 0.0824, RHW: 0.1333, XHHW: 0.0814 },
+    "3AWG(35 mm2)": { THW: 0.1134, THHN: 0.0973, RHW: 0.1521, XHHW: 0.0962 },
+    "2AWG(35 mm2)": { THW: 0.1333, THHN: 0.1158, RHW: 0.1750, XHHW: 0.1146 },
+    "1AWG(50 mm2)": { THW: 0.1901, THHN: 0.1562, RHW: 0.2660, XHHW: 0.1534 },
+    "1/0AWG(55 mm2)": { THW: 0.2223, THHN: 0.1855, RHW: 0.3039, XHHW: 0.1825 },
+    "2/0AWG(70 mm2)": { THW: 0.2624, THHN: 0.2223, RHW: 0.3505, XHHW: 0.2190 },
+    "3/0AWG(95 mm2)": { THW: 0.3117, THHN: 0.2679, RHW: 0.4072, XHHW: 0.2642 },
+    "4/0AWG(120 mm2)": { THW: 0.3718, THHN: 0.3237, RHW: 0.4754, XHHW: 0.3197 },
+    "250 Kcmill": { THW: 0.4596, THHN: 0.3970, RHW: 0.6291, XHHW: 0.3904 },
+    "300 Kcmill": { THW: 0.5281, THHN: 0.4608, RHW: 0.7088, XHHW: 0.4536 },
+    "350 Kcmill": { THW: 0.5958, THHN: 0.5242, RHW: 0.7870, XHHW: 0.5166 },
+    "400 Kcmill": { THW: 0.6619, THHN: 0.5863, RHW: 0.8626, XHHW: 0.5782 },
+    "500 Kcmill": { THW: 0.7901, THHN: 0.7073, RHW: 1.0082, XHHW: 0.6984 },
+    "600 Kcmill": { THW: 0.9729, THHN: 0.8676, RHW: 1.2135, XHHW: 0.8709 },
+    "700 Kcmill": { THW: 1.1010, THHN: 0.9887, RHW: 1.3561, XHHW: 0.9923 },
+    "750 Kcmill": { THW: 1.1652, THHN: 1.0496, RHW: 1.4272, XHHW: 1.0532 },
+    "800 Kcmill": { THW: 1.2272, THHN: 1.1085, RHW: 1.4957, XHHW: 1.1122 },
+    "900 Kcmill": { THW: 1.3561, THHN: 1.2311, RHW: 1.6377, XHHW: 1.2351 },
+    "1000 Kcmill": { THW: 1.4784, THHN: 1.3478, RHW: 1.7719, XHHW: 1.3519 }
+  };
 
-  <div id="result"></div>
+  const conduitSizes = {
+    EMT: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }, { size: 3, maxFill: 1.25 }],
+    ENT: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }, { size: 3, maxFill: 1.25 }],
+    FMC: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }],
+    IMC: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }],
+    LFNC_A: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }],
+    LFNC_B: [{ size: 1, maxFill: 0.53 }],
+    LFMC: [{ size: 1, maxFill: 0.53 }],
+    RMC: [{ size: 1, maxFill: 0.53 }],
+    PVC40: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }],
+    PVC80: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }]
+  };
 
-  <script>
-    const wireSizes = {
-      "14 AWG(2.5 mm2)": { THW: 0.0139, THHN: 0.0097, RHW: 0.0293, XHHW: 0.0139 },
-      "12AWG(4 mm2)": { THW: 0.0181, THHN: 0.0133, RHW: 0.0353, XHHW: 0.0181 }
-      // Add more wire sizes here as needed
-    };
+  const insulationTypes = ["THW", "THHN", "RHW", "XHHW"];
+  const wireSizeOptions = Object.keys(wireSizes);
 
-    const auxiliarySizes = {
-      LV: {
-        "22/2": 0.0147, "22/3": 0.0172, "22/4": 0.0201, "22/6": 0.0284, "22/8": 0.0346,
-        "20/2": 0.0184, "20/3": 0.0214, "20/4": 0.0254, "20/6": 0.0353,
-        "18/2": 0.0222, "18/3": 0.0269, "18/4": 0.0317, "18/6": 0.0491, "18/8": 0.0661,
-        "16/2": 0.0287, "16/4": 0.0449, "14/2": 0.0479, "14/4": 0.0693,
-        "12/2": 0.0661, "12/4": 0.0881, "CAT3": 0.0346, "CAT5": 0.0346
-      },
-      Fiber: {
-        "2f": 0.0266, "4f": 0.0314, "6f": 0.0380, "8f": 0.0434, "12f": 0.0511,
-        "24f": 0.1932, "36f": 0.3257, "48f": 0.3088, "72f": 0.4827,
-        "96f": 0.7253, "144f": 0.8446
-      }
-    };
+  function addElectricalRow() {
+    const tbody = document.querySelector("#electricalTable tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="number" min="1" value="1" onchange="updateArea(this)"></td>
+      <td><select onchange="updateArea(this)">
+        ${wireSizeOptions.map(w => `<option value="${w}">${w}</option>`).join("")}
+      </select></td>
+      <td><select onchange="updateArea(this)">
+        ${insulationTypes.map(i => `<option value="${i}">${i}</option>`).join("")}
+      </select></td>
+      <td class="area">0.0000</td>
+      <td><button onclick="removeRow(this)">Delete</button></td>
+    `;
+    tbody.appendChild(tr);
+    updateArea(tr.querySelector("select"));
+  }
 
-    const conduitSizes = {
-      EMT: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }, { size: 3, maxFill: 1.25 }],
-      ENT: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }, { size: 3, maxFill: 1.25 }],
-      FMC: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }],
-      IMC: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }],
-      LFNC_A: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }],
-      LFNC_B: [{ size: 1, maxFill: 0.53 }],
-      LFMC: [{ size: 1, maxFill: 0.53 }],
-      RMC: [{ size: 1, maxFill: 0.53 }],
-      PVC40: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }],
-      PVC80: [{ size: 1, maxFill: 0.53 }, { size: 2, maxFill: 0.78 }]
-    };
+  function removeRow(btn) {
+    btn.closest("tr").remove();
+    updateTotals();
+  }
 
-    const insulationTypes = ["THW", "THHN", "RHW", "XHHW"];
-    const wireSizeOptions = Object.keys(wireSizes);
-    const lvSizeOptions = Object.keys(auxiliarySizes.LV);
-    const fiberSizeOptions = Object.keys(auxiliarySizes.Fiber);
+  function updateArea(el) {
+    const row = el.closest("tr");
+    const count = parseInt(row.querySelector("input").value) || 0;
+    const selects = row.querySelectorAll("select");
+    const wireSize = selects[0].value;
+    const insulation = selects[1].value;
+    const unitArea = wireSizes[wireSize]?.[insulation] || 0;
+    const totalArea = count * unitArea;
+    row.querySelector(".area").textContent = totalArea.toFixed(4);
+    updateTotals();
+  }
 
-    function toggleTables() {
-      const type = document.getElementById("usageType").value;
-      document.getElementById("electricalSection").classList.toggle("hidden", type === "auxiliary");
-      document.getElementById("auxiliarySection").classList.toggle("hidden", type === "electrical");
-      updateTotals();
-    }
+  function updateTotals() {
+    let totalArea = 0;
+    let totalConductors = 0;
 
-    function addElectricalRow() {
-      const tbody = document.querySelector("#electricalTable tbody");
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><input type="number" min="1" value="1" onchange="updateArea(this)"></td>
-        <td><select onchange="updateArea(this)">
-          ${wireSizeOptions.map(w => `<option value="${w}">${w}</option>`).join("")}
-        </select></td>
-        <td><select onchange="updateArea(this)">
-          ${insulationTypes.map(i => `<option value="${i}">${i}</option>`).join("")}
-        </select></td>
-        <td class="area">0.0000</td>
-        <td><button onclick="removeRow(this)">Delete</button></td>
-      `;
-      tbody.appendChild(tr);
-      updateArea(tr.querySelector("select"));
-    }
-
-    function addAuxiliaryRow() {
-      const tbody = document.querySelector("#auxiliaryTable tbody");
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><input type="number" min="1" value="1" onchange="updateArea(this)"></td>
-        <td><select onchange="updateAuxSizeOptions(this)">
-          <option value="LV">LV</option>
-          <option value="Fiber">Fiber</option>
-        </select></td>
-        <td><select onchange="updateArea(this)"></select></td>
-        <td class="area">0.0000</td>
-        <td><button onclick="removeRow(this)">Delete</button></td>
-      `;
-      tbody.appendChild(tr);
-      updateAuxSizeOptions(tr.querySelector("select"));
-    }
-
-    function updateAuxSizeOptions(typeSelect) {
-      const row = typeSelect.closest("tr");
-      const sizeSelect = row.querySelectorAll("select")[1];
-      const type = typeSelect.value;
-      const sizeList = type === "LV" ? lvSizeOptions : fiberSizeOptions;
-      sizeSelect.innerHTML = sizeList.map(s => `<option value="${s}">${s}</option>`).join("");
-      updateArea(sizeSelect);
-    }
-
-    function removeRow(btn) {
-      btn.closest("tr").remove();
-      updateTotals();
-    }
-
-    function updateArea(el) {
-      const row = el.closest("tr");
+    document.querySelectorAll("#electricalTable tbody tr").forEach(row => {
       const count = parseInt(row.querySelector("input").value) || 0;
-      const selects = row.querySelectorAll("select");
-      let unitArea = 0;
+      const area = parseFloat(row.querySelector(".area").textContent) || 0;
+      totalConductors += count;
+      totalArea += area;
+    });
 
-      if (selects.length === 3) {
-        const wireSize = selects[0].value;
-        const insulation = selects[1].value;
-        unitArea = wireSizes[wireSize]?.[insulation] || 0;
-      } else if (selects.length === 2) {
-        const cableType = selects[0].value;
-        const cableSize = selects[1].value;
-        unitArea = auxiliarySizes[cableType]?.[cableSize] || 0;
+    let fillRatio = totalConductors === 1 ? 0.53 : (totalConductors === 2 ? 0.31 : 0.40);
+    const requiredArea = totalArea / fillRatio;
+    const conduitType = document.getElementById("conduitType").value;
+    const options = conduitSizes[conduitType] || [];
+
+    let suggestedSize = "Not available";
+    for (let opt of options) {
+      if (opt.maxFill >= requiredArea) {
+        suggestedSize = `${opt.size} (Max Fill ${opt.maxFill} in²)`;
+        break;
       }
-
-      const totalArea = count * unitArea;
-      row.querySelector(".area").textContent = totalArea.toFixed(4);
-      updateTotals();
     }
 
-    function updateTotals() {
-      let totalArea = 0;
-      let totalConductors = 0;
+    document.getElementById("result").innerHTML = `
+      <strong>Total Conductors:</strong> ${totalConductors}<br>
+      <strong>Total Area of Conductors:</strong> ${totalArea.toFixed(4)} in²<br>
+      <strong>NEC Fill %:</strong> ${(fillRatio * 100).toFixed(0)}%<br>
+      <strong>Required Area w/ Fill:</strong> ${requiredArea.toFixed(4)} in²<br>
+      <strong>Suggested Conduit Size:</strong> ${suggestedSize}
+    `;
+  }
 
-      if (!document.getElementById("electricalSection").classList.contains("hidden")) {
-        document.querySelectorAll("#electricalTable tbody tr").forEach(row => {
-          const count = parseInt(row.querySelector("input").value) || 0;
-          const area = parseFloat(row.querySelector(".area").textContent) || 0;
-          totalConductors += count;
-          totalArea += area;
-        });
-      }
-
-      if (!document.getElementById("auxiliarySection").classList.contains("hidden")) {
-        document.querySelectorAll("#auxiliaryTable tbody tr").forEach(row => {
-          const count = parseInt(row.querySelector("input").value) || 0;
-          const area = parseFloat(row.querySelector(".area").textContent) || 0;
-          totalConductors += count;
-          totalArea += area;
-        });
-      }
-
-      let fillRatio = totalConductors === 1 ? 0.53 : (totalConductors === 2 ? 0.31 : 0.40);
-      const requiredArea = totalArea / fillRatio;
-      const conduitType = document.getElementById("conduitType").value;
-      const options = conduitSizes[conduitType] || [];
-
-      let suggestedSize = "Not available";
-      for (let opt of options) {
-        if (opt.maxFill >= requiredArea) {
-          suggestedSize = `${opt.size} (Max Fill ${opt.maxFill} in²)`;
-          break;
-        }
-      }
-
-      document.getElementById("result").innerHTML = `
-        <strong>Total Conductors:</strong> ${totalConductors}<br>
-        <strong>Total Area of Conductors:</strong> ${totalArea.toFixed(4)} in²<br>
-        <strong>NEC Fill %:</strong> ${(fillRatio * 100).toFixed(0)}%<br>
-        <strong>Required Area w/ Fill:</strong> ${requiredArea.toFixed(4)} in²<br>
-        <strong>Suggested Conduit Size:</strong> ${suggestedSize}
-      `;
-    }
-
-    addElectricalRow(); // Load 1 row on start
-  </script>
+  // Initial row
+  addElectricalRow();
+</script>
 </body>
 </html>
