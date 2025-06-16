@@ -204,7 +204,6 @@ function updateTotals() {
   })).filter(item => item.area >= requiredArea);
 
   let minSize = validSizes.length > 0 ? validSizes[0] : null;
-  let maxSize = validSizes.length > 0 ? validSizes[validSizes.length - 1] : null;
 
   const resultBox = document.getElementById("result");
   resultBox.innerHTML = `
@@ -212,8 +211,7 @@ function updateTotals() {
     <strong>Total Area of Conductors:</strong> ${totalArea.toFixed(4)} in²<br>
     <strong>NEC Fill %:</strong> ${(fillRatio * 100).toFixed(0)}%<br>
     <strong>Required Area w/ Fill:</strong> ${requiredArea.toFixed(4)} in²<br>
-    <strong>Minimum Conduit Size:</strong> ${minSize ? `${minSize.label} ${conduitType} (${minSize.area.toFixed(3)} in²)` : 'Not available'}<br>
-    <strong>Maximum Conduit Size:</strong> ${maxSize ? `${maxSize.label} ${conduitType} (${maxSize.area.toFixed(3)} in²)` : 'Not available'}
+    <strong>Minimum Conduit Size:</strong> ${minSize ? `${minSize.label} ${conduitType} (${minSize.area.toFixed(3)} in²)` : 'Not available'}
   `;
 }
 
