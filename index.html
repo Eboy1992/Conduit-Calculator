@@ -197,13 +197,16 @@ function updateTotals() {
 
   const tradeLabels = tradeSizeLabels[conduitType] || sizes.map((_, i) => `Size ${i + 1}`);
 
-  const validSizes = sizes.map((area, i) => ({
-    index: i,
-    area,
-    label: tradeLabels[i]
-  })).filter(item => item.area >= requiredArea);
-
-  let minSize = validSizes.length > 0 ? validSizes[0] : null;
+  // Create range-mapping version (like Excel)
+  let minSize = null;
+  for (let i = 0; i < sizes.length; i++) {
+    let lower = i === 0 ? 0 : sizes[i - 1] + 0.001;
+    let upper = sizes[i];
+    if (requiredArea >= lower && requiredArea <= upper) {
+      minSize = { label: tradeLabels[i], area: sizes[i] };
+      break;
+    }
+  }
 
   const resultBox = document.getElementById("result");
   resultBox.innerHTML = `
