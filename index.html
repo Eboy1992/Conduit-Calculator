@@ -186,7 +186,7 @@ function updateTotals() {
     totalArea += area;
   });
 
-  const fillRatio = totalConductors === 1 ? 0.53 : totalConductors === 2 ? 0.31 : 0.40;
+  let fillRatio = totalConductors === 1 ? 0.53 : (totalConductors === 2 ? 0.31 : 0.40);
   const requiredArea = totalArea / fillRatio;
   const conduitType = document.getElementById("conduitType").value;
   const sizes = conduitSizes[conduitType] || [];
@@ -194,12 +194,19 @@ function updateTotals() {
   let suggestedSize = "Not available";
   for (let i = 0; i < sizes.length; i++) {
     if (sizes[i] >= requiredArea) {
-      const tradeSize =
-        conduitType === "RMC" ? rmcTradeSizes[i] :
-        conduitType === "EMT" ? emtTradeSizes[i] :
-        conduitType === "IMC" ? imcTradeSizes[i] :
-        `Trade Size ${i + 1}`;
-      suggestedSize = `${tradeSize} ${conduitType} (Max Fill ${sizes[i].toFixed(3)} in²)`;
+      let tradeSizeLabel = "";
+
+      if (conduitType === "RMC") {
+        tradeSizeLabel = rmcTradeSizes[i];
+      } else if (conduitType === "EMT") {
+        tradeSizeLabel = emtTradeSizes[i];
+      } else if (conduitType === "IMC") {
+        tradeSizeLabel = imcTradeSizes[i];
+      } else {
+        tradeSizeLabel = `Size ${i + 1}`;  // fallback for others like PVC, LFMC
+      }
+
+      suggestedSize = `${tradeSizeLabel} ${conduitType} (Max Fill ${sizes[i].toFixed(3)} in²)`;
       break;
     }
   }
