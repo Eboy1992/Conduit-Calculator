@@ -212,6 +212,8 @@ function updateTotals() {
     if (sizes[i] >= requiredArea) {
       if (conduitType === "RMC") {
         suggestedSize = `${rmcTradeSizes[i]} RMC (Max Fill ${sizes[i].toFixed(3)} in²)`;
+      } else if (conduitType === "EMT") {
+  suggestedSize = `${emtTradeSizes[i]} EMT (Max Fill ${sizes[i].toFixed(3)} in²)`;
       } else {
         suggestedSize = `Trade Size ${i + 1} ${conduitType} (Max Fill ${sizes[i].toFixed(3)} in²)`;
       }
