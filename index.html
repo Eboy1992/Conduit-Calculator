@@ -2,40 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Automatic Conductor Sizing Calculator</title>
+  <title>Conduit Sizing Calculator</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f4f8;
-      padding: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1rem;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-    }
-    th {
-      background: #dfe6e9;
-    }
-    input, select {
-      width: 100%;
-    }
-    #addRow {
-      margin: 10px 0;
-    }
-    .result {
-      margin-top: 20px;
-      font-weight: bold;
-    }
+    body { font-family: Arial, sans-serif; background: #f0f4f8; padding: 20px; }
+    h2 { color: #2c3e50; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #e1eaf1; }
+    select, input { width: 100%; padding: 5px; }
+    #output { margin-top: 20px; font-weight: bold; }
   </style>
 </head>
 <body>
 
-<h2>Conductor and Conduit Size Calculator</h2>
+<h2>Automatic Conduit Sizing Calculator</h2>
 
 <table id="conductorTable">
   <thead>
@@ -49,55 +29,51 @@
     <tr>
       <td>
         <select class="wire-size">
-          <option value="14 AWG(2.5 mm2)">14 AWG(2.5 mm2)</option>
-          <option value="12AWG(4 mm2)">12AWG(4 mm2)</option>
-          <option value="10AWG(6 mm2)">10AWG(6 mm2)</option>
-          <option value="8AWG(10 mm2)">8AWG(10 mm2)</option>
-          <option value="6AWG(16 mm2)">6AWG(16 mm2)</option>
-          <option value="4AWG(25 mm2)">4AWG(25 mm2)</option>
-          <option value="3AWG(35 mm2)">3AWG(35 mm2)</option>
-          <option value="2AWG(35 mm2)">2AWG(35 mm2)</option>
-          <option value="1AWG(50 mm2)">1AWG(50 mm2)</option>
-          <option value="1/0AWG(55 mm2)">1/0AWG(55 mm2)</option>
-          <option value="2/0AWG(70 mm2)">2/0AWG(70 mm2)</option>
-          <option value="3/0AWG(95 mm2)">3/0AWG(95 mm2)</option>
-          <option value="4/0AWG(120 mm2)">4/0AWG(120 mm2)</option>
-          <option value="250 Kcmill">250 Kcmill</option>
-          <option value="300 Kcmill">300 Kcmill</option>
-          <option value="350 Kcmill">350 Kcmill</option>
-          <option value="400 Kcmill">400 Kcmill</option>
-          <option value="500 Kcmill">500 Kcmill</option>
-          <option value="600 Kcmill">600 Kcmill</option>
-          <option value="700 Kcmill">700 Kcmill</option>
-          <option value="750 Kcmill">750 Kcmill</option>
-          <option value="800 Kcmill">800 Kcmill</option>
-          <option value="900 Kcmill">900 Kcmill</option>
-          <option value="1000 Kcmill">1000 Kcmill</option>
+          <option>14 AWG(2.5 mm2)</option>
+          <option>12AWG(4 mm2)</option>
+          <option>10AWG(6 mm2)</option>
+          <option>8AWG(10 mm2)</option>
+          <option>6AWG(16 mm2)</option>
+          <option>4AWG(25 mm2)</option>
+          <option>3AWG(35 mm2)</option>
+          <option>2AWG(35 mm2)</option>
+          <option>1AWG(50 mm2)</option>
+          <option>1/0AWG(55 mm2)</option>
+          <option>2/0AWG(70 mm2)</option>
+          <option>3/0AWG(95 mm2)</option>
+          <option>4/0AWG(120 mm2)</option>
+          <option>250 Kcmill</option>
+          <option>300 Kcmill</option>
+          <option>350 Kcmill</option>
+          <option>400 Kcmill</option>
+          <option>500 Kcmill</option>
+          <option>600 Kcmill</option>
+          <option>700 Kcmill</option>
+          <option>750 Kcmill</option>
+          <option>800 Kcmill</option>
+          <option>900 Kcmill</option>
+          <option>1000 Kcmill</option>
         </select>
       </td>
       <td>
         <select class="insulation-type">
-          <option value="THW">THW</option>
-          <option value="THHN">THHN</option>
-          <option value="RHW">RHW</option>
-          <option value="XHHW">XHHW</option>
+          <option>THW</option>
+          <option>THHN</option>
+          <option>RHW</option>
+          <option>XHHW</option>
         </select>
       </td>
-      <td><input type="number" class="quantity" value="1" min="1"></td>
+      <td><input type="number" class="quantity" value="1" min="0" onchange="updateTotals()"></td>
     </tr>
   </tbody>
 </table>
 
-<button id="addRow">Add Row</button>
-<select id="conduitType">
-  <option value="RMC">RMC</option>
-  <option value="EMT">EMT</option>
-  <option value="PVC40">PVC40</option>
-</select>
-<button onclick="updateTotals()">Calculate Minimum Conduit Size</button>
+<button onclick="addRow()">Add Row</button>
 
-<div class="result" id="totalArea">Total Area: </div>
-<div class="result" id="minConduit">Minimum Conduit Size: </div>
+<div id="output">
+  <p id="totalArea">Total Area: </p>
+  <p id="minConduit">Minimum RMC Conduit Size: </p>
+</div>
 
 <script>
 const wireSizes = {
@@ -127,18 +103,27 @@ const wireSizes = {
   "1000 Kcmill": { THW: 1.4784, THHN: 1.3478, RHW: 1.7719, XHHW: 1.3519 }
 };
 
-const conduitSizes = {
-  EMT: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087, 1.296, 1.533, 2.036],
-  ENT: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087],
-  FMC: [0.122, 0.213, 0.346, 0.598],
-  IMC: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087, 1.296],
-  LFNC_A: [0.122, 0.213, 0.346],
-  LFNC_B: [0.122, 0.213, 0.346],
-  LFMC: [0.122, 0.213, 0.346],
-  RMC: [0.122, 0.213, 0.346, 0.598, 0.814],
-  PVC40: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087],
-  PVC80: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087]
-};
+function computeMinConduitSize(totalArea) {
+  const rmcTable = [
+    { min: 0, max: 0.314, size: '1/2"' },
+    { min: 0.315, max: 0.549, size: '3/4"' },
+    { min: 0.550, max: 0.887, size: '1"' },
+    { min: 0.888, max: 1.526, size: '1-1/4"' },
+    { min: 1.527, max: 2.071, size: '1-1/2"' },
+    { min: 2.072, max: 3.408, size: '2"' },
+    { min: 3.409, max: 4.866, size: '2-1/2"' },
+    { min: 4.867, max: 7.499, size: '3"' },
+    { min: 7.500, max: 10.010, size: '3-1/2"' },
+    { min: 10.011, max: 12.882, size: '4"' },
+    { min: 12.883, max: 20.212, size: '5"' },
+    { min: 20.213, max: 29.158, size: '6"' },
+    { min: 29.159, max: Infinity, size: 'N/A' }
+  ];
+  for (const r of rmcTable) {
+    if (totalArea >= r.min && totalArea <= r.max) return r.size;
+  }
+  return 'N/A';
+}
 
 function updateTotals() {
   const rows = document.querySelectorAll("#conductorTable tbody tr");
@@ -152,23 +137,21 @@ function updateTotals() {
     totalArea += area * qty;
   });
 
-  const conduitType = document.getElementById("conduitType").value;
-  const sizes = conduitSizes[conduitType];
-  const fillLimit = 0.4; // 40% max fill
+  const fillLimit = 0.4;
+  const adjustedArea = totalArea / fillLimit;
+  const minSize = computeMinConduitSize(adjustedArea);
 
-  let minSize = sizes.find(size => size * fillLimit >= totalArea);
   document.getElementById("totalArea").textContent = `Total Area: ${totalArea.toFixed(4)} in²`;
-  document.getElementById("minConduit").textContent = minSize
-    ? `Minimum Conduit Size: ${minSize.toFixed(3)} in²`
-    : "No suitable conduit size found.";
+  document.getElementById("minConduit").textContent = `Minimum RMC Conduit Size: ${minSize}`;
 }
 
-document.getElementById("addRow").addEventListener("click", () => {
+function addRow() {
   const table = document.querySelector("#conductorTable tbody");
   const newRow = table.rows[0].cloneNode(true);
   newRow.querySelector(".quantity").value = 1;
+  newRow.querySelectorAll("select").forEach(sel => sel.selectedIndex = 0);
   table.appendChild(newRow);
-});
+}
 </script>
 
 </body>
