@@ -2,25 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Automatic Conductor and Conduit Sizing Calculator</title>
+  <title>Conduit Sizing Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f0f4f8;
       padding: 20px;
     }
-    h2 {
-      color: #2c3e50;
-    }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
-      background: white;
+      background: #fff;
     }
     th, td {
-      padding: 10px;
-      text-align: left;
+      padding: 8px;
       border: 1px solid #ccc;
     }
     input, select, button {
@@ -28,27 +23,18 @@
     }
     #result {
       margin-top: 20px;
-      padding: 15px;
+      padding: 10px;
       background: #fff9c4;
       border: 1px solid #fbc02d;
       border-radius: 5px;
-    }
-    button {
-      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <h2>Conductor and Conduit Size Calculator</h2>
+  <h2>Conduit Sizing Calculator</h2>
 
-  <label for="conduitType">Select Conduit Type:</label>
-  <select id="conduitType" onchange="updateTotals()">
-    <option value="RMC">RMC</option>
-    <!-- Add more conduit types as needed -->
-  </select>
-
-  <table id="electricalTable">
+  <table id="conductorTable">
     <thead>
       <tr>
         <th>Quantity</th>
@@ -61,12 +47,12 @@
     <tbody></tbody>
   </table>
 
-  <button onclick="addElectricalRow()">Add Conductor</button>
+  <button onclick="addRow()">Add Conductor</button>
 
   <div id="result"></div>
 
   <script>
-    const wireSizes = {
+    const wireAreas = {
       "14 AWG(2.5 mm2)": { THW: 0.0139, THHN: 0.0097, RHW: 0.0293, XHHW: 0.0139 },
       "12 AWG(3.5 mm2)": { THW: 0.0206, THHN: 0.0133, RHW: 0.0314, XHHW: 0.0206 },
       "10 AWG(5.5 mm2)": { THW: 0.0333, THHN: 0.0211, RHW: 0.0509, XHHW: 0.0333 },
@@ -81,99 +67,80 @@
       "1000 Kcmill": { THW: 1.4784, THHN: 1.3478, RHW: 1.7719, XHHW: 1.3519 }
     };
 
-    const conduitSizes = {
-      RMC: [
-        { min: 0, max: 0.314, label: '1/2"' },
-        { min: 0.315, max: 0.549, label: '3/4"' },
-        { min: 0.550, max: 0.887, label: '1"' },
-        { min: 0.888, max: 1.526, label: '1-1/4"' },
-        { min: 1.527, max: 2.071, label: '1-1/2"' },
-        { min: 2.072, max: 3.408, label: '2"' },
-        { min: 3.409, max: 4.866, label: '2-1/2"' },
-        { min: 4.867, max: 7.499, label: '3"' },
-        { min: 7.500, max: 10.010, label: '3-1/2"' },
-        { min: 10.011, max: 12.882, label: '4"' },
-        { min: 12.883, max: 20.212, label: '5"' },
-        { min: 20.213, max: 29.158, label: '6"' }
-      ]
-    };
+    const conduitSizes = [
+      { size: '1/2"', maxFill: 0.314 },
+      { size: '3/4"', maxFill: 0.549 },
+      { size: '1"', maxFill: 0.887 },
+      { size: '1-1/4"', maxFill: 1.526 },
+      { size: '1-1/2"', maxFill: 2.071 },
+      { size: '2"', maxFill: 3.408 },
+      { size: '2-1/2"', maxFill: 4.866 },
+      { size: '3"', maxFill: 7.499 },
+      { size: '3-1/2"', maxFill: 10.010 },
+      { size: '4"', maxFill: 12.882 },
+      { size: '5"', maxFill: 20.212 },
+      { size: '6"', maxFill: 29.158 }
+    ];
 
-    const insulationTypes = ["THW", "THHN", "RHW", "XHHW"];
-    const wireSizeOptions = Object.keys(wireSizes);
-
-    function addElectricalRow() {
-      const tbody = document.querySelector("#electricalTable tbody");
-      const tr = document.createElement("tr");
+    function addRow() {
+      const tbody = document.querySelector('#conductorTable tbody');
+      const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><input type="number" min="1" value="1" onchange="updateArea(this)"></td>
-        <td><select onchange="updateArea(this)">
-          ${wireSizeOptions.map(w => `<option value="${w}">${w}</option>`).join("")}
-        </select></td>
-        <td><select onchange="updateArea(this)">
-          ${insulationTypes.map(i => `<option value="${i}">${i}</option>`).join("")}
-        </select></td>
+        <td><input type="number" min="1" value="1" onchange="updateTotals()"></td>
+        <td>
+          <select onchange="updateTotals()">
+            ${Object.keys(wireAreas).map(size => `<option value="${size}">${size}</option>`).join("")}
+          </select>
+        </td>
+        <td>
+          <select onchange="updateTotals()">
+            <option value="THW">THW</option>
+            <option value="THHN">THHN</option>
+            <option value="RHW">RHW</option>
+            <option value="XHHW">XHHW</option>
+          </select>
+        </td>
         <td class="area">0.0000</td>
-        <td><button onclick="removeRow(this)">Delete</button></td>
+        <td><button onclick="this.closest('tr').remove(); updateTotals();">Delete</button></td>
       `;
       tbody.appendChild(tr);
-      updateArea(tr.querySelector("input"));
-    }
-
-    function removeRow(btn) {
-      btn.closest("tr").remove();
-      updateTotals();
-    }
-
-    function updateArea(el) {
-      const row = el.closest("tr");
-      const count = parseInt(row.querySelector("input").value) || 0;
-      const selects = row.querySelectorAll("select");
-      const wireSize = selects[0].value;
-      const insulation = selects[1].value;
-      const unitArea = wireSizes[wireSize]?.[insulation] || 0;
-      const totalArea = count * unitArea;
-      row.querySelector(".area").textContent = totalArea.toFixed(4);
       updateTotals();
     }
 
     function updateTotals() {
       let totalArea = 0;
-      let totalConductors = 0;
+      let totalCount = 0;
+      const rows = document.querySelectorAll('#conductorTable tbody tr');
 
-      document.querySelectorAll("#electricalTable tbody tr").forEach(row => {
-        const count = parseInt(row.querySelector("input").value) || 0;
-        const area = parseFloat(row.querySelector(".area").textContent) || 0;
-        totalConductors += count;
+      rows.forEach(row => {
+        const qty = parseInt(row.cells[0].querySelector('input').value) || 0;
+        const size = row.cells[1].querySelector('select').value;
+        const insulation = row.cells[2].querySelector('select').value;
+        const area = (wireAreas[size]?.[insulation] || 0) * qty;
+        row.querySelector('.area').textContent = area.toFixed(4);
         totalArea += area;
+        totalCount += qty;
       });
 
-      let fillRatio = totalConductors === 1 ? 0.53 : (totalConductors === 2 ? 0.31 : 0.40);
-      const requiredArea = totalArea / fillRatio;
+      // Fill percentage per NEC
+      let fillPercent = totalCount === 1 ? 0.53 : totalCount === 2 ? 0.31 : 0.40;
+      const requiredArea = totalArea / fillPercent;
 
-      const conduitType = document.getElementById("conduitType").value;
-      const sizes = conduitSizes[conduitType];
+      const minConduit = conduitSizes.find(c => requiredArea <= c.maxFill);
+      const resultText = minConduit 
+        ? `Minimum Conduit Size Required: <strong>${minConduit.size}</strong> (Max fill: ${minConduit.maxFill} in²)`
+        : "No suitable conduit size found.";
 
-      let suggestedSize = "Not available";
-      if (sizes && sizes.length > 0) {
-        for (let size of sizes) {
-          if (requiredArea >= size.min && requiredArea <= size.max) {
-            suggestedSize = size.label;
-            break;
-          }
-        }
-      }
-
-      document.getElementById("result").innerHTML = `
-        <strong>Total Conductors:</strong> ${totalConductors}<br>
-        <strong>Total Area of Conductors:</strong> ${totalArea.toFixed(4)} in²<br>
-        <strong>NEC Fill %:</strong> ${(fillRatio * 100).toFixed(0)}%<br>
-        <strong>Required Area w/ Fill:</strong> ${requiredArea.toFixed(4)} in²<br>
-        <strong>Suggested Conduit Size:</strong> ${suggestedSize}
+      document.getElementById('result').innerHTML = `
+        <strong>Total Conductor Area:</strong> ${totalArea.toFixed(4)} in²<br>
+        <strong>Conductor Count:</strong> ${totalCount}<br>
+        <strong>Allowed Fill %:</strong> ${(fillPercent * 100).toFixed(0)}%<br>
+        <strong>Required Area (Adjusted for Fill):</strong> ${requiredArea.toFixed(4)} in²<br>
+        ${resultText}
       `;
     }
 
-    // Initialize with one row
-    addElectricalRow();
+    addRow(); // Add initial row
   </script>
 
 </body>
