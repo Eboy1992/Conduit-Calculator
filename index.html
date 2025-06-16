@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -159,17 +159,17 @@ const wireSizeOptions = Object.keys(wireSizes);
 function addElectricalRow() {
   const tbody = document.querySelector("#electricalTable tbody");
   const tr = document.createElement("tr");
-  tr.innerHTML = `
+  tr.innerHTML = 
     <td><input type="number" min="1" value="1" onchange="updateArea(this)"></td>
     <td><select onchange="updateArea(this)">
-      ${wireSizeOptions.map(w => `<option value="${w}">${w}</option>`).join("")}
+      ${wireSizeOptions.map(w => <option value="${w}">${w}</option>).join("")}
     </select></td>
     <td><select onchange="updateArea(this)">
-      ${insulationTypes.map(i => `<option value="${i}">${i}</option>`).join("")}
+      ${insulationTypes.map(i => <option value="${i}">${i}</option>).join("")}
     </select></td>
     <td class="area">0.0000</td>
     <td><button onclick="removeRow(this)">Delete</button></td>
-  `;
+  ;
   tbody.appendChild(tr);
   updateArea(tr.querySelector("select"));
 }
@@ -211,23 +211,21 @@ function updateTotals() {
   for (let i = 0; i < sizes.length; i++) {
     if (sizes[i] >= requiredArea) {
       if (conduitType === "RMC") {
-  suggestedSize = `${rmcTradeSizes[i]} RMC (Max Fill ${sizes[i].toFixed(3)} in²)`;
-} else if (conduitType === "EMT") {
-  suggestedSize = `${emtTradeSizes[i]} EMT (Max Fill ${sizes[i].toFixed(3)} in²)`;
-} else {
-  suggestedSize = `Trade Size ${i + 1} ${conduitType} (Max Fill ${sizes[i].toFixed(3)} in²)`;
-}
+        suggestedSize = ${rmcTradeSizes[i]} RMC (Max Fill ${sizes[i].toFixed(3)} in²);
+      } else {
+        suggestedSize = Trade Size ${i + 1} ${conduitType} (Max Fill ${sizes[i].toFixed(3)} in²);
+      }
       break;
     }
   }
 
-  document.getElementById("result").innerHTML = `
+  document.getElementById("result").innerHTML = 
     <strong>Total Conductors:</strong> ${totalConductors}<br>
     <strong>Total Area of Conductors:</strong> ${totalArea.toFixed(4)} in²<br>
     <strong>NEC Fill %:</strong> ${(fillRatio * 100).toFixed(0)}%<br>
     <strong>Required Area w/ Fill:</strong> ${requiredArea.toFixed(4)} in²<br>
     <strong>Suggested Conduit Size:</strong> ${suggestedSize}
-  `;
+  ;
 }
 
 addElectricalRow();
