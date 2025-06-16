@@ -118,17 +118,20 @@ const wireSizes = {
 
 const conduitSizes = {
   EMT: [0.304, 0.533, 0.864, 1.496, 2.036, 3.356, 5.858, 8.846, 11.545, 14.753],
-  ENT: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087],
+  ENT: [0.246, 0.454, 0.785, 1.410, 1.936, 3.205],
   IMC: [0.342, 0.586, 0.959, 1.647, 2.225, 3.63, 5.135, 7.922, 10.584, 13.631, 20.854],
   RMC: [0.314, 0.549, 0.887, 1.526, 2.071, 3.408, 4.866, 7.499, 10.010, 12.882, 20.212, 29.158],
-  PVC40: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087],
-  PVC80: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087]
+  PVC40: [0.258, 0.508, 0.832, 1.453, 1.986, 3.291, 4.695, 7.268, 9.737, 12.554, 19.761, 28.567],
+  PVC80: [0.217, 0.409, 0.688, 1.237, 1.711, 2.874, 4.119, 6.442, 8.688, 11.258, 17.855, 25.598]
 };
 
 const rmcTradeSizes = ['1/2"', '3/4"', '1"', '1-1/4"', '1-1/2"', '2"', '2-1/2"', '3"', '3-1/2"', '4"', '5"', '6"'];
 const emtTradeSizes = ['1/2"', '3/4"', '1"', '1-1/4"', '1-1/2"', '2"', '2-1/2"', '3"', '3-1/2"', '4"'];
 const imcTradeSizes = ['1/2"', '3/4"', '1"', '1-1/4"', '1-1/2"', '2"', '2-1/2"', '3"', '3-1/2"', '4"', '5"'];
-
+const entTradeSizes = ['1/2"', '3/4"', '1"', '1-1/4"', '1-1/2"', '2"'];
+const PVC40TradeSizes = ['1/2"', '3/4"', '1"', '1-1/4"', '1-1/2"', '2"','2-1/2"', '3"', '3-1/2"', '4"', '5"', '6"']; 
+const pvc80TradeSizes = ['1/2"', '3/4"', '1"', '1-1/4"', '1-1/2"', '2"','2-1/2"', '3"', '3-1/2"', '4"', '5"', '6"'];
+  
 const insulationTypes = ["THW", "THHN", "RHW", "XHHW"];
 const wireSizeOptions = Object.keys(wireSizes);
 
@@ -194,6 +197,12 @@ function updateTotals() {
         tradeSizeLabel = emtTradeSizes[i];
       } else if (conduitType === "IMC") {
         tradeSizeLabel = imcTradeSizes[i];
+      } else if (conduitType === "ENT") {
+        tradeSizeLabel = entTradeSizes[i];
+      } else if (conduitType === "PVC40") {
+        tradeSizeLabel = pvc40TradeSizes[i];
+      } else if (conduitType === "PVC80") {
+        tradeSizeLabel = pvc80TradeSizes[i];
       } else {
         tradeSizeLabel = `Size ${i + 1}`;  // fallback for others like PVC, LFMC
       }
