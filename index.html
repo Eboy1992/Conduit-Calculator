@@ -186,38 +186,34 @@ function updateTotals() {
   const conduitType = document.getElementById("conduitType").value;
   const sizes = conduitSizes[conduitType] || [];
 
-  let suggestedSize = "Not available";
-  for (let i = 0; i < sizes.length; i++) {
-    if (sizes[i] >= requiredArea) {
-      let tradeSizeLabel = "";
+  const tradeSizeLabels = {
+    RMC: rmcTradeSizes,
+    EMT: emtTradeSizes,
+    IMC: imcTradeSizes,
+    ENT: entTradeSizes,
+    PVC40: pvc40TradeSizes,
+    PVC80: pvc80TradeSizes
+  };
 
-      if (conduitType === "RMC") {
-        tradeSizeLabel = rmcTradeSizes[i];
-      } else if (conduitType === "EMT") {
-        tradeSizeLabel = emtTradeSizes[i];
-      } else if (conduitType === "IMC") {
-        tradeSizeLabel = imcTradeSizes[i];
-      } else if (conduitType === "ENT") {
-        tradeSizeLabel = entTradeSizes[i];
-      } else if (conduitType === "PVC40") {
-        tradeSizeLabel = pvc40TradeSizes[i];
-      } else if (conduitType === "PVC80") {
-  tradeSizeLabel = pvc80TradeSizes[i];
-      } else {
-        tradeSizeLabel = `Size ${i + 1}`;  // fallback for others like PVC, LFMC
-      }
+  const tradeLabels = tradeSizeLabels[conduitType] || sizes.map((_, i) => `Size ${i + 1}`);
 
-      suggestedSize = `${tradeSizeLabel} ${conduitType} (Max Fill ${sizes[i].toFixed(3)} in²)`;
-      break;
-    }
-  }
+  const validSizes = sizes.map((area, i) => ({
+    index: i,
+    area,
+    label: tradeLabels[i]
+  })).filter(item => item.area >= requiredArea);
 
-  document.getElementById("result").innerHTML = `
+  let minSize = validSizes.length > 0 ? validSizes[0] : null;
+  let maxSize = validSizes.length > 0 ? validSizes[validSizes.length - 1] : null;
+
+  const resultBox = document.getElementById("result");
+  resultBox.innerHTML = `
     <strong>Total Conductors:</strong> ${totalConductors}<br>
     <strong>Total Area of Conductors:</strong> ${totalArea.toFixed(4)} in²<br>
     <strong>NEC Fill %:</strong> ${(fillRatio * 100).toFixed(0)}%<br>
     <strong>Required Area w/ Fill:</strong> ${requiredArea.toFixed(4)} in²<br>
-    <strong>Suggested Conduit Size:</strong> ${suggestedSize}
+    <strong>Minimum Conduit Size:</strong> ${minSize ? `${minSize.label} ${conduitType} (${minSize.area.toFixed(3)} in²)` : 'Not available'}<br>
+    <strong>Maximum Conduit Size:</strong> ${maxSize ? `${maxSize.label} ${conduitType} (${maxSize.area.toFixed(3)} in²)` : 'Not available'}
   `;
 }
 
