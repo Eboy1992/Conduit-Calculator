@@ -211,12 +211,12 @@ function updateTotals() {
   for (let i = 0; i < sizes.length; i++) {
     if (sizes[i] >= requiredArea) {
       if (conduitType === "RMC") {
-        suggestedSize = `${rmcTradeSizes[i]} RMC (Max Fill ${sizes[i].toFixed(3)} in²)`;
-      } else if (conduitType === "EMT") {
+  suggestedSize = `${rmcTradeSizes[i]} RMC (Max Fill ${sizes[i].toFixed(3)} in²)`;
+} else if (conduitType === "EMT") {
   suggestedSize = `${emtTradeSizes[i]} EMT (Max Fill ${sizes[i].toFixed(3)} in²)`;
-      } else {
-        suggestedSize = `Trade Size ${i + 1} ${conduitType} (Max Fill ${sizes[i].toFixed(3)} in²)`;
-      }
+} else {
+  suggestedSize = `Trade Size ${i + 1} ${conduitType} (Max Fill ${sizes[i].toFixed(3)} in²)`;
+}
       break;
     }
   }
