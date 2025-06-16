@@ -134,7 +134,7 @@ const wireSizes = {
 };
 
 const conduitSizes = {
-  EMT: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087, 1.296, 1.533, 2.036],
+  EMT: [0.304, 0.305, 0.533, 0.534, 0.864, 0.865, 1.496, 1.497, 2.036, 2.037, 3.356, 3.357, 5.858, 5.859, 8.846, 8.847, 11.545, 11.546, 14.753, 14.754],
   ENT: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087],
   FMC: [0.122, 0.213, 0.346, 0.598],
   IMC: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087, 1.296],
@@ -148,6 +148,9 @@ const conduitSizes = {
 
 const rmcTradeSizes = [
   '1/2"', '3/4"', '1"', '1-1/4"', '1-1/2"', '2"', '2-1/2"', '3"', '3-1/2"', '4"', '5"', '6"'
+];
+const emtTradeSizes = [
+  '1/2"', '3/4"', '3/4"', '1"', '1"', '1-1/4"', '1-1/4"', '1-1/2"', '1-1/2"', '2"', '2"', '2-1/2"', '2-1/2"', '3"', '3"', '3-1/2"', '3-1/2"', '4"', '4"', 'N/A'
 ];
 
 const insulationTypes = ["THW", "THHN", "RHW", "XHHW"];
@@ -209,6 +212,9 @@ function updateTotals() {
     if (sizes[i] >= requiredArea) {
       if (conduitType === "RMC") {
         suggestedSize = `${rmcTradeSizes[i]} RMC (Max Fill ${sizes[i].toFixed(3)} in²)`;
+      }
+      if (conduitType === "EMT") {
+        suggestedSize = `${rmcTradeSizes[i]} EMT (Max Fill ${sizes[i].toFixed(3)} in²)`;
       } else {
         suggestedSize = `Trade Size ${i + 1} ${conduitType} (Max Fill ${sizes[i].toFixed(3)} in²)`;
       }
