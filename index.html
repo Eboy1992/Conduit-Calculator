@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -134,7 +134,7 @@ const wireSizes = {
 };
 
 const conduitSizes = {
-  EMT: [0.304, 0.533, 0.864, 1.496, 2.036, 3.356, 5.858, 8.846, 11.545, 14.753],
+  EMT: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087, 1.296, 1.533, 2.036],
   ENT: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087],
   FMC: [0.122, 0.213, 0.346, 0.598],
   IMC: [0.122, 0.213, 0.346, 0.598, 0.814, 1.087, 1.296],
@@ -149,27 +149,24 @@ const conduitSizes = {
 const rmcTradeSizes = [
   '1/2"', '3/4"', '1"', '1-1/4"', '1-1/2"', '2"', '2-1/2"', '3"', '3-1/2"', '4"', '5"', '6"'
 ];
-const emtTradeSizes = [
-  0.304: "1/2\"", 0.533: "3/4\"", 0.864: "1\"", 1.496: "1-1/4\"", 2.036: "1-1/2\"", 3.356: "2\"", 5.858: "2-1/2\"", 8.846: "3\"", 11.545: "3-1/2\"", 14.753: "4\""
-];
-  
+
 const insulationTypes = ["THW", "THHN", "RHW", "XHHW"];
 const wireSizeOptions = Object.keys(wireSizes);
 
 function addElectricalRow() {
   const tbody = document.querySelector("#electricalTable tbody");
   const tr = document.createElement("tr");
-  tr.innerHTML = 
+  tr.innerHTML = `
     <td><input type="number" min="1" value="1" onchange="updateArea(this)"></td>
     <td><select onchange="updateArea(this)">
-      ${wireSizeOptions.map(w => <option value="${w}">${w}</option>).join("")}
+      ${wireSizeOptions.map(w => `<option value="${w}">${w}</option>`).join("")}
     </select></td>
     <td><select onchange="updateArea(this)">
-      ${insulationTypes.map(i => <option value="${i}">${i}</option>).join("")}
+      ${insulationTypes.map(i => `<option value="${i}">${i}</option>`).join("")}
     </select></td>
     <td class="area">0.0000</td>
     <td><button onclick="removeRow(this)">Delete</button></td>
-  ;
+  `;
   tbody.appendChild(tr);
   updateArea(tr.querySelector("select"));
 }
@@ -211,21 +208,21 @@ function updateTotals() {
   for (let i = 0; i < sizes.length; i++) {
     if (sizes[i] >= requiredArea) {
       if (conduitType === "RMC") {
-        suggestedSize = ${rmcTradeSizes[i]} RMC (Max Fill ${sizes[i].toFixed(3)} in²);
+        suggestedSize = `${rmcTradeSizes[i]} RMC (Max Fill ${sizes[i].toFixed(3)} in²)`;
       } else {
-        suggestedSize = Trade Size ${i + 1} ${conduitType} (Max Fill ${sizes[i].toFixed(3)} in²);
+        suggestedSize = `Trade Size ${i + 1} ${conduitType} (Max Fill ${sizes[i].toFixed(3)} in²)`;
       }
       break;
     }
   }
 
-  document.getElementById("result").innerHTML = 
+  document.getElementById("result").innerHTML = `
     <strong>Total Conductors:</strong> ${totalConductors}<br>
     <strong>Total Area of Conductors:</strong> ${totalArea.toFixed(4)} in²<br>
     <strong>NEC Fill %:</strong> ${(fillRatio * 100).toFixed(0)}%<br>
     <strong>Required Area w/ Fill:</strong> ${requiredArea.toFixed(4)} in²<br>
     <strong>Suggested Conduit Size:</strong> ${suggestedSize}
-  ;
+  `;
 }
 
 addElectricalRow();
