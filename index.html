@@ -88,43 +88,42 @@
 
 <div id="result"></div>
 
-  <h3>🔥 Ampacity Reference (Based on PEC/NEC)</h3>
-<table id="ampacityTable">
-  <thead>
-    <tr>
-      <th>Size (AWG/KCMIL)</th>
-      <th>Metric (mm²)</th>
-      <th>60°C (Amp)</th>
-      <th>90°C (Amp)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr><td>14 AWG</td><td>2.5 mm²</td><td>15</td><td>20</td></tr>
-    <tr><td>12 AWG</td><td>4 mm²</td><td>20</td><td>25</td></tr>
-    <tr><td>10 AWG</td><td>6 mm²</td><td>30</td><td>35</td></tr>
-    <tr><td>8 AWG</td><td>10 mm²</td><td>40</td><td>55</td></tr>
-    <tr><td>6 AWG</td><td>16 mm²</td><td>55</td><td>75</td></tr>
-    <tr><td>4 AWG</td><td>25 mm²</td><td>70</td><td>95</td></tr>
-    <tr><td>3 AWG</td><td>35 mm²</td><td>85</td><td>115</td></tr>
-    <tr><td>2 AWG</td><td>35 mm²</td><td>95</td><td>130</td></tr>
-    <tr><td>1 AWG</td><td>50 mm²</td><td>110</td><td>150</td></tr>
-    <tr><td>1/0 AWG</td><td>55 mm²</td><td>125</td><td>170</td></tr>
-    <tr><td>2/0 AWG</td><td>70 mm²</td><td>145</td><td>195</td></tr>
-    <tr><td>3/0 AWG</td><td>95 mm²</td><td>165</td><td>225</td></tr>
-    <tr><td>4/0 AWG</td><td>120 mm²</td><td>195</td><td>260</td></tr>
-    <tr><td>250 KCMIL</td><td>127 mm²</td><td>215</td><td>290</td></tr>
-    <tr><td>300 KCMIL</td><td>152 mm²</td><td>240</td><td>320</td></tr>
-    <tr><td>350 KCMIL</td><td>177 mm²</td><td>260</td><td>350</td></tr>
-    <tr><td>400 KCMIL</td><td>203 mm²</td><td>280</td><td>380</td></tr>
-    <tr><td>500 KCMIL</td><td>253 mm²</td><td>320</td><td>430</td></tr>
-    <tr><td>600 KCMIL</td><td>304 mm²</td><td>355</td><td>475</td></tr>
-    <tr><td>700 KCMIL</td><td>354 mm²</td><td>385</td><td>520</td></tr>
-    <tr><td>750 KCMIL</td><td>380 mm²</td><td>400</td><td>535</td></tr>
-    <tr><td>800 KCMIL</td><td>405 mm²</td><td>410</td><td>545</td></tr>
-    <tr><td>900 KCMIL</td><td>456 mm²</td><td>435</td><td>555</td></tr>
-    <tr><td>1000 KCMIL</td><td>507 mm²</td><td>455</td><td>615</td></tr>
-  </tbody>
-</table>
+<h3>📈 PEC Ampacity Table (Compact)</h3>
+<div class="scrollable-table">
+  <table class="ampacity-table">
+    <thead>
+      <tr>
+        <th>AWG/kcmil</th>
+        <th>mm²</th>
+        <th>60°C<br>(Amp)</th>
+        <th>90°C<br>(Amp)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>14</td><td>2.5</td><td>15</td><td>20</td></tr>
+      <tr><td>12</td><td>4</td><td>20</td><td>25</td></tr>
+      <tr><td>10</td><td>6</td><td>30</td><td>35</td></tr>
+      <tr><td>8</td><td>10</td><td>40</td><td>50</td></tr>
+      <tr><td>6</td><td>16</td><td>55</td><td>65</td></tr>
+      <tr><td>4</td><td>25</td><td>70</td><td>85</td></tr>
+      <tr><td>3</td><td>35</td><td>85</td><td>100</td></tr>
+      <tr><td>2</td><td>35</td><td>95</td><td>115</td></tr>
+      <tr><td>1</td><td>50</td><td>110</td><td>130</td></tr>
+      <tr><td>1/0</td><td>55</td><td>125</td><td>150</td></tr>
+      <tr><td>2/0</td><td>70</td><td>145</td><td>175</td></tr>
+      <tr><td>3/0</td><td>95</td><td>165</td><td>200</td></tr>
+      <tr><td>4/0</td><td>120</td><td>195</td><td>230</td></tr>
+      <tr><td>250</td><td>127</td><td>215</td><td>255</td></tr>
+      <tr><td>300</td><td>152</td><td>240</td><td>285</td></tr>
+      <tr><td>350</td><td>177</td><td>260</td><td>310</td></tr>
+      <tr><td>400</td><td>203</td><td>280</td><td>335</td></tr>
+      <tr><td>500</td><td>253</td><td>320</td><td>380</td></tr>
+      <tr><td>600</td><td>304</td><td>355</td><td>420</td></tr>
+      <tr><td>750</td><td>380</td><td>400</td><td>475</td></tr>
+      <tr><td>1000</td><td>507</td><td>455</td><td>545</td></tr>
+    </tbody>
+  </table>
+</div>
   
 <script>
 const wireSizes = {
